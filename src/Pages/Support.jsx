@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuChevronDown, LuHeadphones, LuMessageCircle, LuPhone } from "react-icons/lu";
 import Footer from "../components/Footer";
 
 function AccordionItem({ question, answer }) {
@@ -17,9 +18,10 @@ function AccordionItem({ question, answer }) {
           {question}
         </span>
         <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 ${open ? "bg-blue-500" : "bg-gray-200"}`}>
-          <svg viewBox="0 0 24 24" fill="none" width="12" height="12" className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
-            <path d="M6 9l6 6 6-6" stroke={open ? "white" : "#6b7280"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <LuChevronDown
+            className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180 text-white" : "text-gray-500"}`}
+            aria-hidden="true"
+          />
         </div>
       </button>
       {open && (
@@ -74,9 +76,7 @@ export default function SupportPage() {
               <div className="space-y-4">
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-blue-500">
-                      <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-                    </svg>
+                    <LuMessageCircle className="w-5 h-5 text-blue-500" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">{t("contact.emailSupport")}</h3>
@@ -88,9 +88,7 @@ export default function SupportPage() {
 
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-blue-500">
-                      <path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257.685a11.042 11.042 0 005.517 5.663l1.007-.304a1 1 0 011.276.44l1.492-2.249a1 1 0 011.093-.093l2.188.659a1 1 0 01.412 1.412l-.659 2.188a1 1 0 01-.44 1.276l-.304 1.007c-2.943 1.273-6.451 2.15-10.15 2.15C5.821 15.004 3 12.171 3 9a2 2 0 012-2z" />
-                    </svg>
+                    <LuPhone className="w-5 h-5 text-blue-500" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">{t("contact.phoneSupport")}</h3>
@@ -102,9 +100,7 @@ export default function SupportPage() {
 
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-blue-500">
-                      <path d="M12 21a9 9 0 019-9V9a2 2 0 00-2-2H5a2 2 0 00-2 2v3a9 9 0 009 9zm0-12a3 3 0 100 6 3 3 0 000-6z" />
-                    </svg>
+                    <LuHeadphones className="w-5 h-5 text-blue-500" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-medium text-gray-900">{t("contact.liveChat")}</h3>

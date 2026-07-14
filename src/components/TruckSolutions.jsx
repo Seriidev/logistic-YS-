@@ -1,3 +1,5 @@
+import { LuCircleCheck } from "react-icons/lu";
+
 const SOLUTIONS = [
   {
     id: 1,
@@ -45,11 +47,7 @@ const SOLUTIONS = [
 
 const CheckItem = ({ text }) => (
   <div className="flex items-center gap-2">
-    <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 flex-shrink-0">
-      <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="1.5"/>
-      <path d="M9 12l2 2 4-4" stroke="#3b82f6" strokeWidth="2"
-        strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
+    <LuCircleCheck className="w-4 h-4 flex-shrink-0 text-blue-500" />
     <span className="text-sm text-gray-600">{text}</span>
   </div>
 );

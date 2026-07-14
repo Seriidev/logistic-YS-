@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuChevronDown, LuMail, LuMapPin, LuPhone } from "react-icons/lu";
 import yuuLogo from "../logo/logo.svg";
 import { ReviewModal } from "./ReviewModal";
 
@@ -31,16 +32,10 @@ function FooterAccordion({ title, children, defaultOpen = false }) {
         aria-expanded={open}
       >
         <span className="text-sm font-bold text-gray-900 uppercase tracking-wide">{title}</span>
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+        <LuChevronDown
           className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           aria-hidden="true"
-        >
-          <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        />
       </button>
       <div
         className={`grid transition-[grid-template-rows] duration-300 ease-out ${open ? "grid-rows-[1fr] pb-5" : "grid-rows-[0fr]"}`}
@@ -82,32 +77,18 @@ function FooterContactContent() {
       labelKey: "email",
       href: "mailto:info@yuusell.com",
       value: "info@yuusell.com",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5" aria-hidden="true">
-          <path d="M4 4h16v16H4z" />
-          <path d="M4 8l8 5 8-5" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
+      icon: <LuMail className="w-5 h-5" aria-hidden="true" />,
     },
     {
       labelKey: "phone",
       href: "tel:+19412889573",
       value: "(+1) 941 288 95 73",
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5" aria-hidden="true">
-          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      ),
+      icon: <LuPhone className="w-5 h-5" aria-hidden="true" />,
     },
     {
       labelKey: "location",
       value: t("footer.contact.locationValue"),
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5" aria-hidden="true">
-          <path d="M12 21s7-4.5 7-11a7 7 0 10-14 0c0 6.5 7 11 7 11z" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="12" cy="10" r="2.5" />
-        </svg>
-      ),
+      icon: <LuMapPin className="w-5 h-5" aria-hidden="true" />,
     },
   ];
 

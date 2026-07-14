@@ -1,24 +1,18 @@
 import { useTranslation } from "react-i18next";
+import { LuPlane, LuShip, LuTruck } from "react-icons/lu";
 
 const ROUTE_KEYS = ["0", "1", "2", "3"];
 const ROUTE_TYPES = ["air", "truck", "air", "truck"];
 
+const TYPE_ICONS = {
+  air: LuPlane,
+  truck: LuTruck,
+  sea: LuShip,
+};
+
 const TypeIcon = ({ type }) => {
-  if (type === "air") return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white/70">
-      <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 00-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z" />
-    </svg>
-  );
-  if (type === "truck") return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white/70">
-      <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8zM5.5 19a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-    </svg>
-  );
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-white/70">
-      <path d="M20 21H4a2 2 0 01-2-2V5l2-3h16l2 3v14a2 2 0 01-2 2zM4 8h16M8 8v13M16 8v13" />
-    </svg>
-  );
+  const Icon = TYPE_ICONS[type] ?? LuShip;
+  return <Icon className="w-4 h-4 text-white/70" />;
 };
 
 export default function PromoBanner() {

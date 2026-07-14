@@ -1,3 +1,9 @@
+import {
+  LuCircleCheck,
+  LuFileText,
+  LuMapPin,
+  LuTruck,
+} from "react-icons/lu";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
@@ -5,32 +11,10 @@ import { SectionHeading } from "./shared";
 const STEP_KEYS = ["request", "collection", "planning", "delivery"];
 
 const STEP_ICONS = {
-  request: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-8 h-8">
-      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  collection: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-8 h-8">
-      <rect x="1" y="3" width="15" height="13" rx="2" />
-      <path d="M16 8h4l3 3v5h-7V8z" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="5.5" cy="18.5" r="2.5" />
-      <circle cx="18.5" cy="18.5" r="2.5" />
-    </svg>
-  ),
-  planning: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-8 h-8">
-      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="10" r="3" />
-    </svg>
-  ),
-  delivery: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-8 h-8">
-      <path d="M22 11.08V12a10 10 0 11-5.93-9.14" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M22 4L12 14.01l-3-3" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
+  request: LuFileText,
+  collection: LuTruck,
+  planning: LuMapPin,
+  delivery: LuCircleCheck,
 };
 
 export default function TruckHowItWorks() {
@@ -42,7 +26,7 @@ export default function TruckHowItWorks() {
         num: t(`howItWorks.steps.${key}.num`),
         title: t(`howItWorks.steps.${key}.title`),
         description: t(`howItWorks.steps.${key}.description`),
-        icon: STEP_ICONS[key],
+        Icon: STEP_ICONS[key],
       })),
     [t],
   );
@@ -85,7 +69,7 @@ export default function TruckHowItWorks() {
               )}
 
               <div className="flex justify-center mt-4 mb-4 sm:mb-5 h-14 sm:h-16">
-                {step.icon}
+                <step.Icon className="w-8 h-8 text-blue-500" strokeWidth={1.5} aria-hidden />
               </div>
 
               <h3 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-2">{step.title}</h3>

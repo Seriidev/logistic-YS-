@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LuCheck, LuDownload } from "react-icons/lu";
 import { getPaymentMethodLabel } from "../../i18n/paymentMethodLabels";
 
 function mulberry32(seed) {
@@ -140,9 +141,7 @@ export default function SuccessStep({ booking }) {
     <div className="animate-[fadeIn_0.3s_ease-out] max-w-3xl mx-auto">
       <div className="text-center mb-6 sm:mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-green-100 mb-4">
-          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+          <LuCheck className="w-8 h-8 sm:w-10 sm:h-10 text-green-600" strokeWidth={2.5} />
         </div>
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2">
           {t("success.title", { ns: "truckCargoBooking" })}
@@ -182,9 +181,7 @@ export default function SuccessStep({ booking }) {
             className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-2.5 rounded-full bg-blue-500 text-white
               text-sm font-bold uppercase tracking-wider border-none cursor-pointer hover:bg-blue-600 transition-colors font-[inherit]"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-            </svg>
+            <LuDownload className="w-4 h-4" />
             {t("success.downloadPdf", { ns: "booking" })}
           </button>
           <Link

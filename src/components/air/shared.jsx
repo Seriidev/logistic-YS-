@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuChevronDown, LuCircleCheck, LuImage } from "react-icons/lu";
 
 export function SectionHeading({ eyebrow, title, description, light = false }) {
   return (
@@ -32,16 +33,11 @@ export function SectionHeading({ eyebrow, title, description, light = false }) {
 export function CheckItem({ text }) {
   return (
     <div className="flex items-start gap-2.5 min-w-0">
-      <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5">
-        <circle cx="12" cy="12" r="10" stroke="#3b82f6" strokeWidth="1.5" />
-        <path
-          d="M9 12l2 2 4-4"
-          stroke="#3b82f6"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <LuCircleCheck
+        className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 mt-0.5 text-blue-500"
+        strokeWidth={1.5}
+        aria-hidden
+      />
       <span className="text-xs sm:text-sm text-gray-600 leading-relaxed">{text}</span>
     </div>
   );
@@ -49,6 +45,19 @@ export function CheckItem({ text }) {
 
 export function ImageBlock({ src, alt, hint, className = "" }) {
   const { t } = useTranslation("airCargo");
+  const [failed, setFailed] = useState(false);
+  const fallbackHint = hint || t("shared.imageHint", { path: src });
+
+  if (failed) {
+    return (
+      <div
+        className={`overflow-hidden bg-gray-100 flex flex-col items-center justify-center gap-2 ${className}`}
+      >
+        <LuImage className="w-12 h-12 text-gray-400" strokeWidth={1.5} aria-hidden />
+        <p className="text-xs text-gray-400 text-center px-3">{fallbackHint}</p>
+      </div>
+    );
+  }
 
   return (
     <div className={`overflow-hidden bg-gray-100 ${className}`}>
@@ -56,26 +65,7 @@ export function ImageBlock({ src, alt, hint, className = "" }) {
         src={src}
         alt={alt}
         className="w-full h-full object-cover"
-        onError={(e) => {
-          e.target.style.display = "none";
-          const parent = e.target.parentElement;
-          parent.style.display = "flex";
-          parent.style.alignItems = "center";
-          parent.style.justifyContent = "center";
-          parent.style.flexDirection = "column";
-          parent.style.gap = "8px";
-          const fallbackHint = hint || t("shared.imageHint", { path: src });
-          parent.innerHTML = `
-            <svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"
-              style="width:48px;height:48px">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <path d="M21 15l-5-5L5 21"/>
-            </svg>
-            <p style="font-size:12px;color:#9ca3af;text-align:center;padding:0 12px">
-              ${fallbackHint}
-            </p>`;
-        }}
+        onError={() => setFailed(true)}
       />
     </div>
   );
@@ -109,21 +99,11 @@ export function AccordionItem({ question, answer }) {
             open ? "bg-blue-500" : "bg-gray-200"
           }`}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            width="12"
-            height="12"
-            className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
-          >
-            <path
-              d="M6 9l6 6 6-6"
-              stroke={open ? "white" : "#6b7280"}
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <LuChevronDown
+            className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180 text-white" : "text-gray-500"}`}
+            strokeWidth={2}
+            aria-hidden
+          />
         </div>
       </button>
       {open && (

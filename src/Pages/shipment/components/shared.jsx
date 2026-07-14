@@ -1,14 +1,4 @@
-export const IconChevron = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-gray-400 shrink-0">
-    <path d="M9 18l6-6-6-6" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-export const IconChevronDown = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-gray-400 shrink-0">
-    <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+import { LuChevronDown, LuChevronRight } from "react-icons/lu";
 
 export function FormBlock({ title, children }) {
   return (
@@ -35,7 +25,7 @@ export function ClickField({ label, value, placeholder, onClick }) {
         <span className={`text-sm truncate ${value ? "text-gray-900 font-medium" : "text-gray-400"}`}>
           {value || placeholder}
         </span>
-        <IconChevron />
+        <LuChevronRight className="w-4 h-4 text-gray-400 shrink-0" aria-hidden="true" />
       </button>
     </div>
   );
@@ -78,7 +68,7 @@ export function SelectInput({ label, placeholder, options, value, onChange, getO
           })}
         </select>
         <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-          <IconChevronDown />
+          <LuChevronDown className="w-4 h-4 text-gray-400 shrink-0" aria-hidden="true" />
         </span>
       </div>
     </label>

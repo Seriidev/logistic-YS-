@@ -1,3 +1,4 @@
+import { LuQuote } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
 
@@ -37,9 +38,7 @@ export default function AirSuccessMetrics() {
               key={id}
               className="rounded-2xl sm:rounded-3xl bg-white border border-gray-100 p-5 sm:p-6 min-w-0"
             >
-              <svg viewBox="0 0 24 24" fill="#3b82f6" className="w-8 h-8 opacity-30 mb-3">
-                <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z" />
-              </svg>
+              <LuQuote className="w-8 h-8 text-blue-500 opacity-30 mb-3" aria-hidden />
               <p className="text-sm text-gray-600 leading-relaxed mb-4">&ldquo;{t(`successMetrics.testimonials.${id}.quote`)}&rdquo;</p>
               <footer>
                 <p className="text-sm font-bold text-gray-900">{t(`successMetrics.testimonials.${id}.author`)}</p>

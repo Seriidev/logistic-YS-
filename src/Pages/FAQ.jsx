@@ -1,28 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuBuilding, LuChevronDown, LuCreditCard, LuTruck } from "react-icons/lu";
 import Footer from "../components/Footer";
 
 const SECTION_IDS = ["shipping", "orders", "business"];
 
 const SECTION_ICONS = {
-  shipping: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" aria-hidden="true">
-      <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="5.5" cy="18.5" r="2.5" />
-      <circle cx="18.5" cy="18.5" r="2.5" />
-    </svg>
-  ),
-  orders: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" aria-hidden="true">
-      <rect x="2" y="5" width="20" height="14" rx="2" />
-      <path d="M2 10h20" strokeLinecap="round" />
-    </svg>
-  ),
-  business: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 shrink-0" aria-hidden="true">
-      <path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
+  shipping: LuTruck,
+  orders: LuCreditCard,
+  business: LuBuilding,
 };
 
 const SCROLL_OFFSET = 128;
@@ -51,9 +37,7 @@ function AccordionItem({ question, answer }) {
           className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
             ${open ? "bg-blue-500 text-white rotate-180" : "bg-gray-100 text-gray-500"}`}
         >
-          <svg viewBox="0 0 24 24" fill="none" width="14" height="14" aria-hidden="true">
-            <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <LuChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
         </span>
       </button>
 
@@ -73,6 +57,8 @@ function AccordionItem({ question, answer }) {
 }
 
 function SidebarNavButton({ section, isActive, onClick, compact = false }) {
+  const SectionIcon = SECTION_ICONS[section.id];
+
   return (
     <button
       type="button"
@@ -97,7 +83,7 @@ function SidebarNavButton({ section, isActive, onClick, compact = false }) {
             ? compact ? "text-white/90" : "bg-white/20 text-white"
             : "bg-gray-100 text-gray-500 group-hover:bg-blue-50 group-hover:text-blue-500"}`}
       >
-        {SECTION_ICONS[section.id]}
+        <SectionIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
       </span>
       <span className="min-w-0 leading-snug">{section.title}</span>
     </button>
@@ -215,11 +201,13 @@ export default function FAQPage() {
           <div className="flex-1 min-w-0 w-full lg:pt-1">
             <div className="rounded-2xl sm:rounded-3xl border border-gray-100 bg-white/80 backdrop-blur-sm p-5 sm:p-6 lg:p-8 shadow-sm">
               <div className="flex flex-col gap-10 sm:gap-11 lg:gap-12 pb-2 sm:pb-4 lg:pb-6">
-                {faqData.map((section) => (
+                {faqData.map((section) => {
+                  const SectionIcon = SECTION_ICONS[section.id];
+                  return (
                   <div key={section.id} id={section.id} className="scroll-mt-32 sm:scroll-mt-36 min-w-0">
                     <div className="flex items-center gap-3 mb-5 sm:mb-6 pb-4 sm:pb-5 border-b border-gray-100">
                       <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-blue-50 text-blue-500">
-                        {SECTION_ICONS[section.id]}
+                        <SectionIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
                       </span>
                       <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">
                         {section.title}
@@ -231,7 +219,8 @@ export default function FAQPage() {
                       ))}
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

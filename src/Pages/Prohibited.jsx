@@ -1,13 +1,15 @@
 import { useTranslation } from "react-i18next";
+import { LuDownload } from "react-icons/lu";
 import Footer from "../components/Footer";
 import { PROHIBITED, SPECIAL } from "../data/prohibitedItems";
 
 function ItemCard({ item, t }) {
   const title = t(item.titleKey);
+  const { Icon } = item;
   return (
     <div className="bg-white rounded-2xl p-5 flex flex-col items-center text-center gap-3 shadow-sm hover:shadow-md transition-shadow duration-200">
-      <div className="w-20 h-20 flex items-center justify-center">
-        <img src={item.icon} alt={title} className="w-16 h-16 object-contain" />
+      <div className="w-20 h-20 flex items-center justify-center text-gray-700">
+        <Icon className="w-16 h-16" aria-hidden="true" />
       </div>
       <p className="text-xs font-semibold text-gray-800 leading-snug">{title}</p>
     </div>
@@ -78,15 +80,7 @@ export default function ProhibitedItemsPage() {
             className="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white text-sm font-semibold px-6 py-2.5 no-underline transition-colors duration-150 border border-white/30"
           >
             {t("banner.downloadPdf")}
-            <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-              <path
-                d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <LuDownload className="w-3.5 h-3.5" aria-hidden="true" />
           </a>
         </div>
       </section>

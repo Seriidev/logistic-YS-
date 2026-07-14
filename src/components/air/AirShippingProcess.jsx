@@ -1,15 +1,16 @@
+import { LuBox, LuCalculator, LuPackage, LuPlane, LuTruck } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
 import { isAuthenticated } from "../../utils/auth";
 
 const STEP_CONFIG = [
-  { num: "01", icon: "/steps icon/calc icon.png" },
-  { num: "02", icon: "/steps icon/truck icon.png" },
-  { num: "03", icon: "/steps icon/packet.png" },
-  { num: "04", icon: "/steps icon/air icon.png" },
-  { num: "05", icon: "/steps icon/air icon.png" },
-  { num: "06", icon: "/steps icon/parcel.png" },
+  { num: "01", Icon: LuCalculator },
+  { num: "02", Icon: LuTruck },
+  { num: "03", Icon: LuPackage },
+  { num: "04", Icon: LuPlane },
+  { num: "05", Icon: LuPlane },
+  { num: "06", Icon: LuBox },
 ];
 
 export default function AirShippingProcess() {
@@ -47,7 +48,7 @@ export default function AirShippingProcess() {
             </div>
 
             <div className="flex justify-center mt-4 mb-4 sm:mb-5 h-16 sm:h-20">
-              <img src={step.icon} alt="" className="h-full w-auto object-contain" />
+              <step.Icon className="w-12 h-12 sm:w-16 sm:h-16 text-blue-500" strokeWidth={1.5} aria-hidden />
             </div>
 
             <h3 className="text-base sm:text-lg font-bold text-gray-900 text-center mb-2">{t(`shippingProcess.steps.${step.num}.title`)}</h3>

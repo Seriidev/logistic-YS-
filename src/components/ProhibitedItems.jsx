@@ -1,17 +1,29 @@
 import { PROHIBITED, SPECIAL } from "../data/prohibitedItems";
 
-const ItemCard = ({ item }) => (
-  <div className="bg-white rounded-2xl p-5 flex flex-col items-center text-center gap-3">
-    <div className="w-20 h-20 flex items-center justify-center">
-      <img
-        src={item.icon}
-        alt={item.title}
-        className="w-16 h-16 object-contain"
-      />
+const TITLES = {
+  "items.explosives": "Explosives",
+  "items.firearms": "Firearms & ammunition",
+  "items.flammable": "Flammable liquids",
+  "items.toxic": "Toxic substances",
+  "items.radioactive": "Radioactive materials",
+  "items.lithiumBatteries": "Lithium batteries",
+  "items.perishable": "Perishable goods",
+  "items.culturalAssets": "Cultural assets",
+  "special.dryIce": "Dry ice",
+  "special.medicines": "Medicines",
+};
+
+const ItemCard = ({ item }) => {
+  const { Icon } = item;
+  return (
+    <div className="bg-white rounded-2xl p-5 flex flex-col items-center text-center gap-3">
+      <div className="w-20 h-20 flex items-center justify-center">
+        <Icon className="w-16 h-16 text-blue-500" aria-hidden />
+      </div>
+      <p className="text-xs font-semibold text-gray-800 leading-snug">{TITLES[item.titleKey]}</p>
     </div>
-    <p className="text-xs font-semibold text-gray-800 leading-snug">{item.title}</p>
-  </div>
-);
+  );
+};
 
 export default function ProhibitedItems() {
   return (

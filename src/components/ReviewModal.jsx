@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaStar } from "react-icons/fa";
+import { LuX } from "react-icons/lu";
 
 function StarRating({ rating, setRating, t }) {
   const [hovered, setHovered] = useState(0);
@@ -16,13 +18,11 @@ function StarRating({ rating, setRating, t }) {
           aria-label={t("reviewModal.star", { count: star })}
           className="border-none bg-transparent cursor-pointer p-0.5 rounded-md transition-transform hover:scale-110"
         >
-          <svg
-            viewBox="0 0 24 24"
+          <FaStar
             className="w-7 h-7 sm:w-8 sm:h-8 transition-colors duration-150"
-            fill={star <= (hovered || rating) ? "#f59e0b" : "#e5e7eb"}
-          >
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
+            color={star <= (hovered || rating) ? "#f59e0b" : "#e5e7eb"}
+            aria-hidden="true"
+          />
         </button>
       ))}
     </div>
@@ -94,9 +94,7 @@ export function ReviewModal({ isOpen, onClose }) {
             aria-label={tc("shared.modal.close")}
             className="w-9 h-9 shrink-0 rounded-full bg-gray-100 flex items-center justify-center border-none cursor-pointer hover:bg-gray-200 transition-colors"
           >
-            <svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <LuX className="w-4 h-4 text-gray-500" aria-hidden="true" />
           </button>
         </div>
 

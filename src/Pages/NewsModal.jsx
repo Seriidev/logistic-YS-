@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { LuEye, LuX } from "react-icons/lu";
 
 export function NewsModal({ isOpen, onClose, news }) {
   const { t } = useTranslation("news");
@@ -22,9 +23,7 @@ export function NewsModal({ isOpen, onClose, news }) {
           onClick={onClose}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center border-none cursor-pointer hover:bg-gray-200 transition-colors z-10"
         >
-          <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-            <path d="M18 6L6 18M6 6l12 12" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <LuX className="w-3.5 h-3.5 text-gray-500" aria-hidden="true" />
         </button>
 
         {news.image && (
@@ -43,10 +42,7 @@ export function NewsModal({ isOpen, onClose, news }) {
         <div className="p-5 sm:p-8 min-w-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-1.5 text-xs text-gray-400">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-3.5 h-3.5">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
+              <LuEye className="w-3.5 h-3.5" aria-hidden="true" />
               {news.views}
             </div>
             <span className="text-xs text-gray-400">{news.date}</span>

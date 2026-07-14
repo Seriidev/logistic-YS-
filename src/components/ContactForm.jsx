@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuBriefcase, LuChevronDown } from "react-icons/lu";
 import PhoneInputField from "./PhoneInputField";
 import { getPhoneValidationError } from "../utils/phone";
 
@@ -99,11 +100,7 @@ export default function ContactForm() {
               </label>
               <div className="relative">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    strokeWidth="1.5" className="w-4 h-4">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
-                  </svg>
+                  <LuBriefcase className="w-4 h-4" aria-hidden="true" />
                 </div>
                 <select
                   value={shipping}
@@ -121,10 +118,7 @@ export default function ContactForm() {
                   ))}
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    strokeWidth="2" className="w-4 h-4">
-                    <path d="M6 9l6 6 6-6"/>
-                  </svg>
+                  <LuChevronDown className="w-4 h-4" aria-hidden="true" />
                 </div>
               </div>
             </div>

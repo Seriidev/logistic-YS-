@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LuCheck, LuChevronDown, LuMenu, LuPhone, LuSearch, LuX } from "react-icons/lu";
 import yuuLogo from "../logo/logo.svg";
 import i18n, { LOCALE_BY_CODE } from "../i18n";
 
@@ -34,48 +35,6 @@ function getCodeByLocale(locale) {
   const entry = Object.entries(LOCALE_BY_CODE).find(([, lng]) => lng === locale);
   return entry ? entry[0] : "EN";
 }
-
-const IconSearch = ({ className = "" }) => (
-  <svg className={`w-4 h-4 ${className}`} viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-  </svg>
-);
-
-const IconPhone = () => (
-  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8a19.79 19.79 0 01-3.07-8.7A2 2 0 012 .93h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7a2 2 0 011.72 2.02z" />
-  </svg>
-);
-
-const IconChevron = ({ open, className = "" }) => (
-  <svg
-    className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"} ${className}`}
-    viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
-
-const IconCheck = () => (
-  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-const IconMenu = () => (
-  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
-  </svg>
-);
-
-const IconClose = () => (
-  <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-    <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-  </svg>
-);
 
 function NavLink({ href, label, active, onClick, mobile = false }) {
   const isRoute = href.startsWith("/");
@@ -120,7 +79,7 @@ function SearchBar({ compact = false }) {
           ${focused ? "bg-white border border-blue-500 shadow-sm" : "bg-gray-100 border border-transparent"}
         `}
       >
-        <IconSearch className="text-gray-400 mr-2 shrink-0" />
+        <LuSearch className="w-4 h-4 text-gray-400 mr-2 shrink-0" />
         <input
           type="search"
           placeholder={t("header.search.placeholder")}
@@ -152,7 +111,7 @@ function LangItem({ lang, name, isSelected, onSelect }) {
       <span className="text-base w-5 text-center leading-none shrink-0">{lang.flag}</span>
       <span className="flex-1 text-left truncate">{name}</span>
       <span className={`text-blue-500 shrink-0 ${isSelected ? "opacity-100" : "opacity-0"}`}>
-        <IconCheck />
+        <LuCheck className="w-3.5 h-3.5" />
       </span>
     </button>
   );
@@ -273,7 +232,7 @@ function LanguageSwitcher({ className = "", preferPlacement = "auto", elevated =
         `}
       >
         <span>{selected.code}</span>
-        <IconChevron open={open} className={open ? "text-blue-500" : "text-gray-400"} />
+        <LuChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : "rotate-0"} ${open ? "text-blue-500" : "text-gray-400"}`} />
       </button>
 
       <div
@@ -368,7 +327,7 @@ export default function Header() {
             className="hidden xl:flex items-center gap-1.5 text-sm font-medium text-gray-900
               no-underline px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors shrink-0"
           >
-            <span className="text-blue-500"><IconPhone /></span>
+            <span className="text-blue-500"><LuPhone className="w-4 h-4" /></span>
             +7 (800) 555-35-35
           </a>
 
@@ -396,7 +355,7 @@ export default function Header() {
             aria-label={menuOpen ? t("header.menu.close") : t("header.menu.open")}
             aria-expanded={menuOpen}
           >
-            {menuOpen ? <IconClose /> : <IconMenu />}
+            {menuOpen ? <LuX className="w-6 h-6" /> : <LuMenu className="w-6 h-6" />}
           </button>
         </div>
 
@@ -438,7 +397,7 @@ export default function Header() {
                 className="w-11 h-11 flex items-center justify-center rounded-xl hover:bg-gray-100 border-none bg-transparent cursor-pointer"
                 aria-label={t("header.menu.close")}
               >
-                <IconClose />
+                <LuX className="w-6 h-6" />
               </button>
             </div>
 
@@ -461,7 +420,7 @@ export default function Header() {
                 className="flex items-center justify-center gap-2 h-11 rounded-xl bg-gray-50 text-gray-900
                   no-underline text-sm font-semibold"
               >
-                <span className="text-blue-500"><IconPhone /></span>
+                <span className="text-blue-500"><LuPhone className="w-4 h-4" /></span>
                 +7 (800) 555-35-35
               </a>
               <LanguageSwitcher

@@ -1,3 +1,5 @@
+import { LuCircleCheck, LuPackage, LuTruck } from "react-icons/lu";
+
 const CHECKS = [
   "24×7 Real-time Visibility",
   "Secure first and last-mile integrations",
@@ -79,13 +81,7 @@ export default function FreightQuote() {
           <div className="bg-white rounded-2xl p-5 mb-4">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5"
-                  className="w-5 h-5">
-                  <rect x="1" y="8" width="15" height="13" rx="2"/>
-                  <path d="M16 13h3l3 3v4h-6v-7z"/>
-                  <circle cx="5.5" cy="21" r="2"/>
-                  <circle cx="18.5" cy="21" r="2"/>
-                </svg>
+                <LuTruck className="w-5 h-5 text-blue-500" />
               </div>
               <span className="font-bold text-gray-900">FTL Shipping</span>
             </div>
@@ -109,10 +105,7 @@ export default function FreightQuote() {
           <div className="bg-white rounded-2xl p-5 mb-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5"
-                  className="w-5 h-5">
-                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 001 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
-                </svg>
+                <LuPackage className="w-5 h-5 text-blue-500" />
               </div>
               <span className="font-bold text-gray-900">LTL Shipping</span>
             </div>
@@ -136,11 +129,7 @@ export default function FreightQuote() {
           <div className="flex flex-col gap-2 mb-6">
             {CHECKS.map((item) => (
               <div key={item} className="flex items-center gap-2">
-                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4 flex-shrink-0">
-                  <circle cx="12" cy="12" r="10" fill="white" opacity="0.2"/>
-                  <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2"
-                    strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
+                <LuCircleCheck className="w-4 h-4 flex-shrink-0 text-white" />
                 <span className="text-white text-sm">{item}</span>
               </div>
             ))}

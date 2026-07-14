@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LuChevronDown, LuSearch } from "react-icons/lu";
 
 const CONTINENTS = [
   "All Continents",
@@ -86,10 +87,7 @@ export default function TruckHero() {
                 ))}
               </select>
               <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2"
-                    strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <LuChevronDown className="w-3.5 h-3.5" />
               </span>
             </div>
 
@@ -105,10 +103,7 @@ export default function TruckHero() {
                   text-sm border-none outline-none font-[inherit] min-w-0"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-                  <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-                  <path d="m21 21-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+                <LuSearch className="w-3.5 h-3.5" />
               </span>
 
               {showResults && search && filtered.length > 0 && (

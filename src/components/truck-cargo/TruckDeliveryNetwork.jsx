@@ -1,3 +1,4 @@
+import { LuMap } from "react-icons/lu";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
@@ -76,10 +77,11 @@ export default function TruckDeliveryNetwork() {
 
         <div className="rounded-2xl sm:rounded-3xl overflow-hidden bg-white/10 border border-white/20 min-h-[220px] sm:min-h-[320px] flex items-center justify-center">
           <div className="text-center px-4 py-8 sm:py-12">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1" className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-60">
-              <path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M8 2v16M16 6v16" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <LuMap
+              className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-60 text-white"
+              strokeWidth={1}
+              aria-hidden
+            />
             <p className="text-sm sm:text-base text-blue-100 font-medium">
               {t("deliveryNetwork.mapTitle")}
             </p>

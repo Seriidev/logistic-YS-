@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuPaperclip } from "react-icons/lu";
 import Footer from "../components/Footer";
 import PhoneInputField from "../components/PhoneInputField";
 import { getPhoneValidationError } from "../utils/phone";
@@ -175,9 +176,7 @@ export default function ContactPage() {
               <p className="text-blue-100 text-xs mb-2">{t("form.fileExtensions")}</p>
               <label className="flex items-center gap-2 cursor-pointer w-fit">
                 <div className="flex items-center gap-2 bg-white/20 hover:bg-white/30 transition-colors px-3 py-1.5 rounded-full">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" className="w-3.5 h-3.5">
-                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-                  </svg>
+                  <LuPaperclip className="w-3.5 h-3.5 text-white" aria-hidden="true" />
                   <span className="text-white text-xs font-medium">
                     {file ? file.name : t("form.attachFile")}
                   </span>

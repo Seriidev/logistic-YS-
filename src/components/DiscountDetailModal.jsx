@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { LuX } from "react-icons/lu";
 
 function ModalBulletList({ title, items }) {
   if (!items?.length) return null;
@@ -75,9 +76,7 @@ export default function DiscountDetailModal({ isOpen, onClose, discount }) {
             aria-label={t("close")}
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-none bg-gray-100 cursor-pointer hover:bg-gray-200 transition-colors duration-200"
           >
-            <svg viewBox="0 0 24 24" fill="none" width="16" height="16" aria-hidden="true">
-              <path d="M18 6L6 18M6 6l12 12" stroke="#6b7280" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <LuX className="w-4 h-4 text-gray-500" aria-hidden="true" />
           </button>
         </div>
 

@@ -1,3 +1,11 @@
+import {
+  LuActivity,
+  LuClock,
+  LuCrosshair,
+  LuDollarSign,
+  LuHeadphones,
+  LuHouse,
+} from "react-icons/lu";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { SectionHeading, ImageBlock } from "./shared";
@@ -12,41 +20,12 @@ const BENEFIT_KEYS = [
 ];
 
 const BENEFIT_ICONS = {
-  flexibleRoutes: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M3 12h4l3-8 4 16 3-8h4" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  fastGroundDelivery: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 6v6l4 2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  doorToDoor: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M9 22V12h6v10" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  costEffective: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  ),
-  realTimeTracking: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <circle cx="12" cy="12" r="10" />
-      <circle cx="12" cy="12" r="3" />
-      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" strokeLinecap="round" />
-    </svg>
-  ),
-  dedicatedSupport: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-      <path d="M3 18v-6a9 9 0 0118 0v6" strokeLinecap="round" />
-      <path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z" strokeLinecap="round" />
-    </svg>
-  ),
+  flexibleRoutes: LuActivity,
+  fastGroundDelivery: LuClock,
+  doorToDoor: LuHouse,
+  costEffective: LuDollarSign,
+  realTimeTracking: LuCrosshair,
+  dedicatedSupport: LuHeadphones,
 };
 
 export default function TruckWhyChooseUs() {
@@ -58,7 +37,7 @@ export default function TruckWhyChooseUs() {
         id: key,
         title: t(`whyChooseUs.benefits.${key}.title`),
         description: t(`whyChooseUs.benefits.${key}.description`),
-        icon: BENEFIT_ICONS[key],
+        Icon: BENEFIT_ICONS[key],
       })),
     [t],
   );
@@ -88,7 +67,7 @@ export default function TruckWhyChooseUs() {
                   hover:bg-blue-50 hover:shadow-md transition-all duration-200 border border-gray-100 min-w-0"
               >
                 <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                  {benefit.icon}
+                  <benefit.Icon className="w-5 h-5 text-blue-500" strokeWidth={1.5} aria-hidden />
                 </div>
                 <div className="min-w-0">
                   <h3 className="text-sm font-semibold text-blue-600 mb-0.5">{benefit.title}</h3>

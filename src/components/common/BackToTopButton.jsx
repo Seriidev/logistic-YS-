@@ -1,6 +1,6 @@
+import { LuChevronUp } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-
 const SCROLL_THRESHOLD = 400;
 
 export default function BackToTopButton() {
@@ -44,18 +44,7 @@ export default function BackToTopButton() {
           : "opacity-0 scale-90 pointer-events-none"}
       `}
     >
-      <svg
-        className="w-5 h-5 sm:w-6 sm:h-6"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <polyline points="18 15 12 9 6 15" />
-      </svg>
+      <LuChevronUp className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
     </button>
   );
 }

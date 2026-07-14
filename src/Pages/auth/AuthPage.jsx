@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { LuEye, LuEyeOff } from "react-icons/lu";
+import { FaApple, FaGoogle } from "react-icons/fa";
 import Footer from "../../components/Footer";
+import PasswordInput from "../../components/PasswordInput";
 import PhoneInputField from "../../components/PhoneInputField";
 import { loginUser, registerUser } from "../../utils/auth";
 import { getPhoneValidationError } from "../../utils/phone";
@@ -12,21 +13,6 @@ const inputClass =
   "w-full h-12 px-4 rounded-xl bg-[#f0f2f5] border border-transparent outline-none text-sm text-gray-900 font-[inherit] placeholder:text-gray-400 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all";
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-
-const IconGoogle = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-  </svg>
-);
-
-const IconApple = () => (
-  <svg viewBox="0 0 24 24" className="w-5 h-5 fill-gray-900" aria-hidden="true">
-    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-  </svg>
-);
 
 function LegalText() {
   const { t } = useTranslation("auth");
@@ -64,9 +50,14 @@ export default function AuthPage() {
   const [surname, setSurname] = useState("");
   const [phone, setPhone] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const isLoginFormValid = useMemo(() => {
+    if (!isValidEmail(email)) return false;
+    if (!password.trim()) return false;
+    return true;
+  }, [email, password]);
 
   const isSignupFormValid = useMemo(() => {
     if (!name.trim() || !surname.trim()) return false;
@@ -189,16 +180,12 @@ export default function AuthPage() {
                       />
                     </label>
 
-                    <label className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium text-gray-500">{t("fields.password")}</span>
-                      <input
-                        type="password"
-                        placeholder={t("fields.passwordPlaceholder")}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className={inputClass}
-                      />
-                    </label>
+                    <PasswordInput
+                      label={t("fields.password")}
+                      placeholder={t("fields.passwordPlaceholder")}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
 
                     <div className="relative flex items-center gap-3 my-2">
                       <div className="flex-1 h-px bg-gray-200" />
@@ -212,14 +199,14 @@ export default function AuthPage() {
                         className="flex h-12 items-center justify-center rounded-xl bg-[#f0f2f5] border-none cursor-pointer hover:bg-gray-200 transition-colors"
                         aria-label={t("social.google")}
                       >
-                        <IconGoogle />
+                        <FaGoogle className="w-5 h-5 text-[#4285F4]" aria-hidden="true" />
                       </button>
                       <button
                         type="button"
                         className="flex h-12 items-center justify-center rounded-xl bg-[#f0f2f5] border-none cursor-pointer hover:bg-gray-200 transition-colors"
                         aria-label={t("social.apple")}
                       >
-                        <IconApple />
+                        <FaApple className="w-5 h-5 text-gray-900" aria-hidden="true" />
                       </button>
                     </div>
 
@@ -227,7 +214,11 @@ export default function AuthPage() {
 
                     <button
                       type="submit"
-                      className="mt-2 w-full min-h-[48px] bg-[#9baff9] hover:bg-[#7a97f5] text-white text-sm font-bold uppercase tracking-wider rounded-2xl border-none cursor-pointer transition-colors duration-150 font-[inherit] flex items-center justify-center gap-2"
+                      disabled={!isLoginFormValid || loading}
+                      className={`mt-2 w-full min-h-[48px] text-white text-sm font-bold uppercase tracking-wider rounded-2xl border-none transition-colors duration-150 font-[inherit] flex items-center justify-center gap-2
+                        ${isLoginFormValid && !loading
+                          ? "bg-[#3b63f1] hover:bg-[#2d52e0] cursor-pointer"
+                          : "bg-[#b8c8f8] cursor-not-allowed"}`}
                     >
                       {t("submit.logIn")}
                       <span aria-hidden="true">→</span>
@@ -268,27 +259,13 @@ export default function AuthPage() {
                       placeholder={t("fields.phonePlaceholder")}
                     />
 
-                    <label className="flex flex-col gap-1.5">
-                      <span className="text-xs font-medium text-gray-500">{t("fields.password")}</span>
-                      <div className="relative">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          placeholder={t("fields.passwordPlaceholder")}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className={`${inputClass} pr-12`}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((v) => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 border-none bg-transparent cursor-pointer transition-colors"
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                        >
-                          {showPassword ? <LuEyeOff className="w-5 h-5" /> : <LuEye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                    </label>
+                    <PasswordInput
+                      label={t("fields.password")}
+                      placeholder={t("fields.passwordPlaceholder")}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
 
                     <label className="flex flex-col gap-1.5">
                       <span className="text-xs font-medium text-gray-500">{t("fields.email")}</span>

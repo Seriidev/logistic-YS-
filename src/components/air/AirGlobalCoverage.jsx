@@ -1,3 +1,4 @@
+import { LuGlobe } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
 
@@ -56,10 +57,11 @@ export default function AirGlobalCoverage() {
 
         <div className="mt-8 sm:mt-10 rounded-2xl sm:rounded-3xl overflow-hidden bg-white/10 border border-white/20 min-h-[200px] sm:min-h-[280px] flex items-center justify-center">
           <div className="text-center px-4 py-8 sm:py-12">
-            <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1" className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-60">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
-            </svg>
+            <LuGlobe
+              className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 opacity-60 text-white"
+              strokeWidth={1}
+              aria-hidden
+            />
             <p className="text-sm sm:text-base text-blue-100 font-medium">
               {t("globalCoverage.map.title")}
             </p>

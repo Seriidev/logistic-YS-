@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { LuFileText } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { SectionHeading, CheckItem, ImageBlock } from "./shared";
 
@@ -50,10 +51,7 @@ export default function AirCustomsSupport() {
               className="rounded-2xl bg-white border border-gray-100 p-5 sm:p-6 min-w-0"
             >
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-3">
-                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5" className="w-5 h-5">
-                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+                <LuFileText className="w-5 h-5 text-blue-500" strokeWidth={1.5} aria-hidden />
               </div>
               <h3 className="text-sm font-bold text-gray-900 mb-1">{t(`customsSupport.documents.${key}.name`)}</h3>
               <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">{t(`customsSupport.documents.${key}.desc`)}</p>

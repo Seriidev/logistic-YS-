@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { FaStar } from "react-icons/fa";
+import { LuArrowRight, LuPaperclip } from "react-icons/lu";
 
 function StarRating({ rating, setRating }) {
   const [hovered, setHovered] = useState(0);
@@ -13,9 +15,11 @@ function StarRating({ rating, setRating }) {
           onMouseLeave={() => setHovered(0)}
           className="border-none bg-transparent cursor-pointer p-0 rounded-full"
         >
-          <svg viewBox="0 0 24 24" className="w-6 h-6 transition-colors duration-100" fill={star <= (hovered || rating) ? "#f59e0b" : "#d1d5db"}>
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
+          <FaStar
+            className="w-6 h-6 transition-colors duration-100"
+            color={star <= (hovered || rating) ? "#f59e0b" : "#d1d5db"}
+            aria-hidden="true"
+          />
         </button>
       ))}
     </div>
@@ -118,9 +122,7 @@ export default function ReviewPage() {
 
             <label className="flex items-center gap-2 cursor-pointer">
               <div className="flex items-center gap-1.5 text-gray-500 hover:text-blue-500 transition-colors">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4">
-                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48" />
-                </svg>
+                <LuPaperclip className="w-4 h-4" aria-hidden="true" />
                 <span className="text-sm font-medium">{file ? file.name : t("form.selectFile")}</span>
               </div>
               <input
@@ -137,9 +139,7 @@ export default function ReviewPage() {
               className="w-full h-11 bg-blue-500 text-white font-bold text-sm uppercase tracking-wider rounded-full border-none cursor-pointer hover:bg-blue-600 active:scale-[0.98] transition-all duration-150 font-[inherit] flex items-center justify-center gap-2"
             >
               {t("form.send")}
-              <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              <LuArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           </div>
         </div>

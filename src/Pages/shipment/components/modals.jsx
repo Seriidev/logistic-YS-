@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuSearch } from "react-icons/lu";
 import ShipmentModal, { ModalActions } from "./ShipmentModal";
 import PhoneInputField from "../../../components/PhoneInputField";
 import { TextInput } from "./shared";
@@ -48,9 +49,7 @@ function LocationModal({ isOpen, onClose, onSave, title, initial }) {
           <span className="text-xs font-medium text-gray-600">{t("fields.address")}</span>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-              <svg viewBox="0 0 24 24" fill="none" width="16" height="16" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
-              </svg>
+              <LuSearch className="w-4 h-4" aria-hidden="true" />
             </span>
             <input
               type="text"

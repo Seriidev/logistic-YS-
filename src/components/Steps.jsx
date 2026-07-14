@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { LuBox, LuCalculator, LuPackage, LuPlane, LuTruck } from "react-icons/lu";
 import { isAuthenticated } from "../utils/auth";
 
 export default function ShippingProcess() {
@@ -15,10 +16,10 @@ export default function ShippingProcess() {
   };
 
   const steps = [
-    { num: "01", icon: "./steps icon/calc icon.png", titleKey: "step1", altKey: "step1" },
-    { num: "02", icon: "./steps icon/truck icon.png", titleKey: "step2", altKey: "step2" },
-    { num: "03", icon: "./steps icon/packet.png", titleKey: "step3", altKey: "step3" },
-    { num: "04", icon: "./steps icon/air icon.png", titleKey: "step4", altKey: "step4" },
+    { num: "01", Icon: LuCalculator, titleKey: "step1", altKey: "step1" },
+    { num: "02", Icon: LuTruck, titleKey: "step2", altKey: "step2" },
+    { num: "03", Icon: LuPackage, titleKey: "step3", altKey: "step3" },
+    { num: "04", Icon: LuPlane, titleKey: "step4", altKey: "step4" },
   ];
 
   return (
@@ -43,12 +44,8 @@ export default function ShippingProcess() {
                 {step.num}
               </div>
 
-              <div className="flex justify-center mb-6 mt-4">
-                <img
-                  src={step.icon}
-                  alt={t(`steps.${step.altKey}.title`)}
-                  className="h-24 w-auto"
-                />
+              <div className="flex justify-center mb-6 mt-4 h-24 items-center">
+                <step.Icon className="w-16 h-16 text-blue-500" aria-label={t(`steps.${step.altKey}.title`)} />
               </div>
 
               <h3 className="text-xl font-semibold text-center mb-2">
@@ -61,12 +58,8 @@ export default function ShippingProcess() {
           ))}
 
           <div className="bg-blue-500 border border-gray-200 rounded-2xl p-5 sm:p-8 hover:shadow-xl transition-shadow relative lg:col-span-1">
-            <div className="flex justify-center mb-6 mt-4">
-              <img
-                src="./steps icon/parcel.png"
-                alt={t("steps.cta.title")}
-                className="h-20 w-auto"
-              />
+            <div className="flex justify-center mb-6 mt-4 h-20 items-center">
+              <LuBox className="w-16 h-16 text-white" aria-label={t("steps.cta.title")} />
             </div>
 
             <h3 className="text-xl text-white font-semibold text-center mb-2">

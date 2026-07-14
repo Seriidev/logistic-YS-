@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { LuChevronDown } from "react-icons/lu";
 import Footer from "../components/Footer";
 
 const SECTION_IDS = ["shipping-options", "how-to-ship", "customs"];
@@ -156,11 +157,10 @@ function AccordionItem({ question, answer }) {
         <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center
           justify-center transition-all duration-200
           ${open ? "bg-blue-500" : "bg-gray-200"}`}>
-          <svg viewBox="0 0 24 24" fill="none" width="12" height="12"
-            className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}>
-            <path d="M6 9l6 6 6-6" stroke={open ? "white" : "#6b7280"}
-              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+          <LuChevronDown
+            className={`w-3 h-3 transition-transform duration-200 ${open ? "rotate-180 text-white" : "text-gray-500"}`}
+            aria-hidden="true"
+          />
         </div>
       </button>
 

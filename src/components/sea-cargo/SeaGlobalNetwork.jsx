@@ -1,3 +1,4 @@
+import { LuGlobe } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { SectionHeading } from "./shared";
 
@@ -62,22 +63,11 @@ export default function SeaGlobalNetwork() {
 
         <div className="rounded-2xl sm:rounded-3xl overflow-hidden bg-white/10 border border-white/20 min-h-[220px] sm:min-h-[360px] flex items-center justify-center">
           <div className="text-center px-4 py-8 sm:py-12 w-full max-w-2xl">
-            <svg
-              viewBox="0 0 400 200"
-              fill="none"
-              className="w-full max-w-md mx-auto mb-4 sm:mb-6 opacity-70"
-              aria-hidden="true"
-            >
-              <ellipse cx="200" cy="100" rx="190" ry="90" stroke="white" strokeWidth="1.5" strokeDasharray="4 4" />
-              <path d="M60 80 Q120 60 180 75 T300 70 Q340 85 350 100" stroke="white" strokeWidth="1" opacity="0.5" />
-              <path d="M50 120 Q150 140 250 115 T370 125" stroke="white" strokeWidth="1" opacity="0.5" />
-              <circle cx="120" cy="75" r="4" fill="white" opacity="0.8" />
-              <circle cx="200" cy="65" r="4" fill="white" opacity="0.8" />
-              <circle cx="280" cy="80" r="4" fill="white" opacity="0.8" />
-              <circle cx="160" cy="130" r="4" fill="white" opacity="0.8" />
-              <circle cx="240" cy="120" r="4" fill="white" opacity="0.8" />
-              <circle cx="320" cy="110" r="4" fill="white" opacity="0.8" />
-            </svg>
+            <LuGlobe
+              className="w-16 h-16 sm:w-24 sm:h-24 mx-auto mb-4 sm:mb-6 opacity-70 text-white"
+              strokeWidth={1}
+              aria-hidden
+            />
             <p className="text-sm sm:text-base text-blue-100 font-medium">
               {t("globalNetwork.mapTitle")}
             </p>

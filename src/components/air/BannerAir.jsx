@@ -1,3 +1,4 @@
+import { LuPlane } from "react-icons/lu";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -40,12 +41,11 @@ export default function AirHero() {
           />
         </div>
 
-        <img
-          src="/steps icon/air icon.png"
-          alt=""
+        <LuPlane
+          aria-hidden
           className="hidden sm:block absolute right-4 lg:right-10 bottom-4 sm:bottom-6
-            h-24 sm:h-32 md:h-40 lg:h-48 max-w-[45%] object-contain pointer-events-none opacity-90"
-          onError={(e) => { e.target.style.display = "none"; }}
+            h-24 sm:h-32 md:h-40 lg:h-48 w-auto max-w-[45%] pointer-events-none opacity-90 text-white/90"
+          strokeWidth={1.25}
         />
 
         <div

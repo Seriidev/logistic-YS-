@@ -1,18 +1,7 @@
 import { CARRIERS, SHIPPING_SPEEDS } from "../constants";
 import { useTranslation } from "react-i18next";
+import { LuPlane, LuShip } from "react-icons/lu";
 import { FormBlock } from "../components/shared";
-
-const ShipIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-blue-500" stroke="currentColor" strokeWidth="1.5">
-    <path d="M3 18h18M4 14l3-6h7l4 6M7 8V6a1 1 0 011-1h4a1 1 0 011 1v2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const PlaneIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-blue-500" stroke="currentColor" strokeWidth="1.5">
-    <path d="M2 12h5l3-8 4 16 3-8h5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 export default function StepDelivery({ data, onChange }) {
   const { t } = useTranslation("shipment");
@@ -26,7 +15,7 @@ export default function StepDelivery({ data, onChange }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {SHIPPING_SPEEDS.map((speed) => {
             const selected = data.speedId === speed.id;
-            const Icon = speed.mode === "air" ? PlaneIcon : ShipIcon;
+            const Icon = speed.mode === "air" ? LuPlane : LuShip;
             return (
               <button
                 key={speed.id}
@@ -37,7 +26,7 @@ export default function StepDelivery({ data, onChange }) {
               >
                 <div className="flex items-center gap-3 px-4 py-3 bg-white">
                   <input type="radio" readOnly checked={selected} className="accent-blue-500" />
-                  <Icon />
+                  <Icon className="w-6 h-6 text-blue-500" aria-hidden="true" />
                   <span className="text-sm font-medium text-gray-900">{t(`shippingSpeeds.${speed.labelKey}`)}</span>
                 </div>
                 <div className={`px-4 py-2 text-sm font-bold ${selected ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-700"}`}>

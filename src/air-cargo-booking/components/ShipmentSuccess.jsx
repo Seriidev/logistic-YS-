@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { LuCheck, LuDownload } from "react-icons/lu";
+import { FaCheckCircle } from "react-icons/fa";
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -146,17 +148,13 @@ export default function ShipmentSuccess({ booking }) {
     <div className="animate-[fadeIn_0.3s_ease-out] max-w-3xl mx-auto">
       <div className="text-center mb-6 sm:mb-8">
         <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-green-100 mb-4">
-          <svg className="w-7 h-7 sm:w-8 sm:h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
+          <LuCheck className="w-7 h-7 sm:w-8 sm:h-8 text-green-600" strokeWidth={2.5} />
         </div>
         <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-gray-900 mb-2">
           {t("success.title", { ns: "booking" })}
         </h2>
         <p className="inline-flex items-center gap-2 text-sm sm:text-base text-green-700 font-medium">
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
+          <FaCheckCircle className="w-4 h-4" />
           {t("success.status", { ns: "booking" })}
         </p>
       </div>
@@ -182,9 +180,7 @@ export default function ShipmentSuccess({ booking }) {
               className="inline-flex items-center justify-center gap-2 min-h-[44px] px-6 py-2.5 rounded-full bg-blue-500 text-white
                 text-sm font-bold uppercase tracking-wider border-none cursor-pointer hover:bg-blue-600 transition-colors font-[inherit]"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
-              </svg>
+              <LuDownload className="w-4 h-4" />
               {t("success.downloadPdf", { ns: "booking" })}
             </button>
           </div>
