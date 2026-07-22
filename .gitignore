@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local backend (do not push)
+backend-logistic-part-4/
+
