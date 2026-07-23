@@ -1,0 +1,62 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [develop, staging, main]
+
+concurrency:
+  group: deploy-frontend-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # GitHub environment name matches branch → enables per-env secrets & approval gates
+    # Set required reviewers on "production" in repo Settings → Environments
+    environment: ${{ github.ref_name == 'main' && 'production' || github.ref_name == 'staging' && 'staging' || 'dev' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve deploy vars from branch
+        id: vars
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          if [ "$BRANCH" = "main" ]; then
+            echo "env=prod"                       >> $GITHUB_OUTPUT
+            echo "project=yuusell-frontend-prod"  >> $GITHUB_OUTPUT
+          elif [ "$BRANCH" = "staging" ]; then
+            echo "env=staging"                    >> $GITHUB_OUTPUT
+            echo "project=yuusell-frontend-staging" >> $GITHUB_OUTPUT
+          else
+            echo "env=dev"                        >> $GITHUB_OUTPUT
+            echo "project=yuusell-frontend-dev"   >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            set -e
+            cd /var/www/yuusell/frontend
+
+            echo "── Pulling (${{ github.ref_name }}) ──"
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git reset --hard origin/${{ github.ref_name }}
+
+            echo "── Building & starting (${{ steps.vars.outputs.env }}) ──"
+            docker compose \
+              --project-name ${{ steps.vars.outputs.project }} \
+              --env-file .env.${{ steps.vars.outputs.env }} \
+              up -d --build --remove-orphans
+
+            echo "── Pruning unused images ──"
+            docker image prune -f
+
+            echo "── Frontend deploy complete (${{ steps.vars.outputs.env }}) ✓ ──"

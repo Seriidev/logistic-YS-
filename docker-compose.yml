@@ -1,0 +1,19 @@
+# Single compose file — works for all environments.
+# Run with: docker compose --project-name yuusell-frontend-<env> --env-file .env.<env> up -d --build
+#
+# Required .env vars: ENV, FRONTEND_PORT, VITE_API_URL
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # VITE_* vars are baked into the Vite build at image build time
+        VITE_API_URL: ${VITE_API_URL}
+    container_name: yuusell-frontend-${ENV}
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT}:3000"

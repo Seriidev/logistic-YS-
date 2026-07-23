@@ -26,3 +26,6 @@ dist-ssr
 # Local backend (do not push)
 backend-logistic-part-4/
 
+# env files (real secrets — never commit)
+.env*
+!.env.*.example
