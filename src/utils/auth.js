@@ -1,43 +1,68 @@
-import { api } from "./api";
-
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api/v1";
 const TOKEN_KEY = "yuusell_token";
+const REFRESH_KEY = "yuusell_refresh_token";
 const USER_KEY = "yuusell_user";
 
 export async function loginUser(email, password) {
-  const data = await api("/auth/login", {
+  const res = await fetch(BASE_URL + "/auth/login", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
-  localStorage.setItem(TOKEN_KEY, data.accessToken);
-  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-  return data.user;
+  if (!res.ok) throw await res.json();
+  const json = await res.json();
+  const token = json.data.tokens.accessToken;
+  const refresh = json.data.tokens.refreshToken;
+  const user = json.data.user;
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(REFRESH_KEY, refresh);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
 }
 
 export async function registerUser(email, password, phone) {
-  const data = await api("/auth/register", {
+  const res = await fetch(BASE_URL + "/auth/register", {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, phone }),
   });
-  localStorage.setItem(TOKEN_KEY, data.accessToken);
-  localStorage.setItem(USER_KEY, JSON.stringify(data.user));
-  return data.user;
+  if (!res.ok) throw await res.json();
+  const json = await res.json();
+  const token = json.data.tokens.accessToken;
+  const refresh = json.data.tokens.refreshToken;
+  const user = json.data.user;
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(REFRESH_KEY, refresh);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
 }
 
 export async function logoutUser() {
   try {
-    await api("/auth/logout", { method: "POST" });
+    const token = localStorage.getItem(TOKEN_KEY);
+    await fetch(BASE_URL + "/auth/logout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
   } catch (_) {}
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(REFRESH_KEY);
   localStorage.removeItem(USER_KEY);
 }
 
 export function isAuthenticated() {
-  return !!localStorage.getItem(TOKEN_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
+  return !!token && token !== "undefined";
 }
 
 export function getStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem(USER_KEY) || "null");
+    const raw = localStorage.getItem(USER_KEY);
+    if (!raw || raw === "undefined") return null;
+    return JSON.parse(raw);
   } catch {
     return null;
   }
