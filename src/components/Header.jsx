@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { LuCheck, LuChevronDown, LuMenu, LuPhone, LuSearch, LuX } from "react-icons/lu";
 import yuuLogo from "../logo/logo.svg";
 import i18n, { LOCALE_BY_CODE } from "../i18n";
+import { isAuthenticated, getStoredUser } from "../utils/auth";
 
 const LANGUAGES = [
   { code: "RU", flag: "🇷🇺", nameKey: "russian", popular: true },
@@ -282,8 +283,13 @@ export default function Header() {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(() => (isAuthenticated() ? getStoredUser() : null));
   const location = useLocation();
   const activeLink = location.pathname || "#services";
+
+  useEffect(() => {
+    setUser(isAuthenticated() ? getStoredUser() : null);
+  }, [location.pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -301,6 +307,10 @@ export default function Header() {
   }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
+
+  const profileInitial = user
+    ? ((user.fullName || "").trim()[0] || (user.email || "").trim()[0] || "U").toUpperCase()
+    : "";
 
   return (
     <header
@@ -333,18 +343,30 @@ export default function Header() {
 
           <div className="hidden lg:flex items-center gap-2 shrink-0">
             <LanguageSwitcher />
-            <Link
-              to="/signup"
-              className="flex items-center h-10 px-4 bg-gray-100 text-gray-900 rounded-full text-sm font-semibold
-                no-underline cursor-pointer hover:bg-blue-600 hover:text-white transition-all font-[inherit]">
-              {t("header.auth.signUp")}
-            </Link>
-            <Link
-              to="/login"
-              className="flex items-center h-10 px-4 bg-blue-500 text-white rounded-full text-sm font-semibold
-                no-underline hover:bg-blue-600 font-[inherit]">
-              {t("header.auth.logIn")}
-            </Link>
+            {user ? (
+              <Link
+                to="/profile"
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-blue-500 text-white text-sm font-semibold
+                  no-underline hover:bg-blue-600 transition-all font-[inherit]"
+              >
+                {profileInitial}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/signup"
+                  className="flex items-center h-10 px-4 bg-gray-100 text-gray-900 rounded-full text-sm font-semibold
+                    no-underline cursor-pointer hover:bg-blue-600 hover:text-white transition-all font-[inherit]">
+                  {t("header.auth.signUp")}
+                </Link>
+                <Link
+                  to="/login"
+                  className="flex items-center h-10 px-4 bg-blue-500 text-white rounded-full text-sm font-semibold
+                    no-underline hover:bg-blue-600 font-[inherit]">
+                  {t("header.auth.logIn")}
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -429,20 +451,34 @@ export default function Header() {
                 elevated
               />
               <div className="grid grid-cols-2 gap-2">
-                <Link
-                  to="/signup"
-                  onClick={closeMenu}
-                  className="flex h-11 items-center justify-center rounded-full border border-gray-200 bg-white text-sm font-semibold text-gray-900 no-underline"
-                >
-                  {t("header.auth.signUp")}
-                </Link>
-                <Link
-                  to="/login"
-                  onClick={closeMenu}
-                  className="h-11 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-semibold no-underline"
-                >
-                  {t("header.auth.logIn")}
-                </Link>
+                {user ? (
+                  <Link
+                    to="/profile"
+                    onClick={closeMenu}
+                    className="col-span-2 flex h-11 items-center justify-center rounded-full bg-blue-500 text-white text-sm font-semibold no-underline hover:bg-blue-600"
+                  >
+                    <span className="flex items-center justify-center h-8 w-8 rounded-full bg-white/20 text-sm font-semibold">
+                      {profileInitial}
+                    </span>
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/signup"
+                      onClick={closeMenu}
+                      className="flex h-11 items-center justify-center rounded-full border border-gray-200 bg-white text-sm font-semibold text-gray-900 no-underline"
+                    >
+                      {t("header.auth.signUp")}
+                    </Link>
+                    <Link
+                      to="/login"
+                      onClick={closeMenu}
+                      className="h-11 flex items-center justify-center rounded-full bg-blue-500 text-white text-sm font-semibold no-underline"
+                    >
+                      {t("header.auth.logIn")}
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
