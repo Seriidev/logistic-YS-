@@ -46,7 +46,7 @@ export default function ProfilePage() {
           city: me.city || "",
           address: me.address || "",
         });
-        setShipments(shipmentsData.data || []);
+        setShipments(shipmentsData.data?.data || []);
       })
       .catch(() => setError("Failed to load profile"))
       .finally(() => setLoading(false));
