@@ -149,17 +149,14 @@ export default function ProfilePage() {
       await api("/auth/me", {
         method: "PATCH",
         body: JSON.stringify({
-          firstName: user.fullName.split(" ")[0] || "",
-          lastName: user.fullName.split(" ").slice(1).join(" ") || "",
-          phone: user.phone,
-          country: user.country,
-          city: user.city,
-          address: user.address,
+          firstName: user.fullName?.split(" ")[0] || "",
+          lastName: user.fullName?.split(" ").slice(1).join(" ") || "",
+          phone: user.phone || "",
         }),
       });
-      alert("Saved!");
+      toast.success("Profile saved!");
     } catch (err) {
-      alert("Failed to save. Please try again.");
+      toast.error("Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -191,6 +188,7 @@ export default function ProfilePage() {
             <p className="text-sm text-gray-500 mt-1">{t("subtitle")}</p>
           </div>
           <button
+            type="button"
             onClick={onSave}
             disabled={saving}
             className="w-full sm:w-fit min-h-[44px] bg-blue-500 text-white text-xs font-bold uppercase tracking-widest px-6 sm:px-8 py-2.5 rounded-full border-none cursor-pointer hover:bg-blue-600 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
