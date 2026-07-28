@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import toast, { Toaster } from "react-hot-toast";
 import Footer from "../components/Footer";
 import PhoneInputField from "../components/PhoneInputField";
 import { api } from "../utils/api";
@@ -29,6 +30,15 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [wallet, setWallet] = useState(null);
+  const [walletLoading, setWalletLoading] = useState(true);
+  const [walletUnavailable, setWalletUnavailable] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [showTxHistory, setShowTxHistory] = useState(false);
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [toUserId, setToUserId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [transferring, setTransferring] = useState(false);
 
   // Load user data from API
   useEffect(() => {
@@ -36,8 +46,14 @@ export default function ProfilePage() {
       window.location.href = "/login";
       return;
     }
-    Promise.all([api("/auth/me"), api("/shipments?limit=3&page=1")])
-      .then(([me, shipmentsData]) => {
+    setWalletLoading(true);
+    Promise.all([
+      api("/auth/me"),
+      api("/shipments?limit=3&page=1"),
+      api("/wallet/me").catch((err) => ({ __walletError: err })),
+      api("/wallet/transactions?limit=3").catch(() => ({ data: [] })),
+    ])
+      .then(([me, shipmentsData, walletData, txData]) => {
         setUser({
           fullName: me.name || me.email,
           email: me.email,
@@ -47,10 +63,71 @@ export default function ProfilePage() {
           address: me.address || "",
         });
         setShipments(shipmentsData.data?.data || []);
+
+        if (walletData?.__walletError) {
+          const err = walletData.__walletError;
+          const is403 = err?.statusCode === 403 || err?.status === 403;
+          if (is403 || err) {
+            setWalletUnavailable(true);
+            setWallet(null);
+          }
+        } else {
+          setWalletUnavailable(false);
+          setWallet(walletData?.data || null);
+        }
+
+        const txList = Array.isArray(txData?.data?.data)
+          ? txData.data.data
+          : Array.isArray(txData?.data)
+            ? txData.data
+            : [];
+        setTransactions(txList.slice(0, 3));
       })
       .catch(() => setError("Failed to load profile"))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setWalletLoading(false);
+      });
   }, []);
+
+  const refreshWallet = async () => {
+    try {
+      const walletData = await api("/wallet/me");
+      setWalletUnavailable(false);
+      setWallet(walletData?.data || null);
+      const txData = await api("/wallet/transactions?limit=3");
+      const txList = Array.isArray(txData?.data?.data)
+        ? txData.data.data
+        : Array.isArray(txData?.data)
+          ? txData.data
+          : [];
+      setTransactions(txList.slice(0, 3));
+    } catch (_) {
+      /* keep current wallet state */
+    }
+  };
+
+  const onTransfer = async () => {
+    setTransferring(true);
+    try {
+      await api("/wallet/transfer", {
+        method: "POST",
+        body: JSON.stringify({
+          toUserId: toUserId.trim(),
+          amount: Number(amount),
+        }),
+      });
+      toast.success("Transfer successful!");
+      setTransferOpen(false);
+      setToUserId("");
+      setAmount("");
+      await refreshWallet();
+    } catch (err) {
+      toast.error(err?.message || "Transfer failed");
+    } finally {
+      setTransferring(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const inTransit = shipments.filter((s) => String(s.status || "").toLowerCase().includes("transit")).length;
@@ -180,6 +257,79 @@ export default function ProfilePage() {
           </div>
 
           <div className="lg:col-span-8 flex flex-col gap-6">
+            <div className="rounded-2xl shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white p-5 sm:p-8">
+              {walletLoading ? (
+                <p className="text-white/90 text-sm font-medium">Loading wallet...</p>
+              ) : walletUnavailable ? (
+                <p className="text-white/90 text-sm font-medium">Wallet unavailable</p>
+              ) : (
+                <>
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <h2 className="text-base font-bold flex items-center gap-2">
+                      <span aria-hidden="true">💰</span>
+                      My Wallet
+                    </h2>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold tracking-wide">
+                      {wallet?.currency || "USD"}
+                    </span>
+                  </div>
+
+                  <p className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+                    ${Number(wallet?.balance ?? 0).toFixed(2)}
+                  </p>
+                  <p className="text-sm text-white/80 mt-1.5 font-medium">
+                    Bonus: ${Number(wallet?.bonusBalance ?? 0).toFixed(2)}
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setTransferOpen(true)}
+                      className="w-full sm:w-auto min-h-[44px] px-5 py-2.5 rounded-full bg-white text-blue-600 text-sm font-bold border-none cursor-pointer hover:bg-blue-50 transition-colors"
+                    >
+                      Transfer Funds
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowTxHistory((v) => !v)}
+                      className="w-full sm:w-auto text-left sm:text-center text-sm font-semibold text-white/90 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-white"
+                    >
+                      Transaction History
+                    </button>
+                  </div>
+
+                  {showTxHistory && (
+                    <div className="mt-5 pt-4 border-t border-white/20 flex flex-col gap-2">
+                      {transactions.length === 0 ? (
+                        <p className="text-sm text-white/70">No recent transactions</p>
+                      ) : (
+                        transactions.map((tx, i) => (
+                          <div
+                            key={tx.id || i}
+                            className="flex items-center justify-between gap-3 bg-white/10 rounded-xl px-3.5 py-2.5"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold truncate">
+                                {tx.type || tx.description || "Transaction"}
+                              </p>
+                              {(tx.createdAt || tx.date) && (
+                                <p className="text-xs text-white/70 mt-0.5">
+                                  {new Date(tx.createdAt || tx.date).toLocaleDateString()}
+                                </p>
+                              )}
+                            </div>
+                            <p className="text-sm font-bold shrink-0">
+                              ${Number(tx.amount ?? 0).toFixed(2)}
+                            </p>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+
             <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-5 sm:p-8">
               <h2 className="text-base font-bold text-gray-900 mb-5">{t("personalDetails")}</h2>
 
@@ -274,6 +424,73 @@ export default function ProfilePage() {
       </section>
 
       <Footer />
+
+      {transferOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/40 border-none cursor-pointer"
+            onClick={() => setTransferOpen(false)}
+            aria-label="Close"
+          />
+          <div className="relative w-full max-w-md bg-white rounded-2xl shadow-xl p-5 sm:p-6">
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <h3 className="text-lg font-bold text-gray-900">Transfer Funds</h3>
+              <button
+                type="button"
+                onClick={() => setTransferOpen(false)}
+                className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 border-none cursor-pointer hover:bg-gray-200 text-lg leading-none"
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <label className="flex flex-col gap-2 mb-4">
+              <span className="text-xs font-semibold text-gray-500">Recipient User ID</span>
+              <input
+                value={toUserId}
+                onChange={(e) => setToUserId(e.target.value)}
+                className="h-11 px-4 rounded-2xl bg-white border border-gray-200 outline-none text-sm text-gray-900 focus:border-blue-400"
+                placeholder="User ID"
+              />
+            </label>
+
+            <label className="flex flex-col gap-2 mb-6">
+              <span className="text-xs font-semibold text-gray-500">Amount ($)</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="h-11 px-4 rounded-2xl bg-white border border-gray-200 outline-none text-sm text-gray-900 focus:border-blue-400"
+                placeholder="0.00"
+              />
+            </label>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setTransferOpen(false)}
+                className="flex-1 h-11 rounded-full border border-gray-200 bg-white text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-50"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={onTransfer}
+                disabled={transferring || !toUserId.trim() || !amount}
+                className="flex-1 h-11 rounded-full border-none bg-blue-500 text-white text-sm font-semibold cursor-pointer hover:bg-blue-600 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {transferring ? "Sending..." : "Send"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Toaster position="top-right" />
     </>
   );
 }
