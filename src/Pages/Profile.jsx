@@ -55,12 +55,13 @@ export default function ProfilePage() {
     ])
       .then(([me, shipmentsData, walletData, txData]) => {
         setUser({
-          fullName: me.name || me.email,
-          email: me.email,
-          phone: me.phone || "",
-          country: me.country || "",
-          city: me.city || "",
-          address: me.address || "",
+          firstName: me.data?.firstName || "",
+          lastName: me.data?.lastName || "",
+          email: me.data?.email || me.email || "",
+          phone: me.data?.phone || me.phone || "",
+          country: me.data?.country || me.country || "",
+          city: me.data?.city || me.city || "",
+          address: me.data?.address || me.address || "",
         });
         setShipments(shipmentsData.data?.data || []);
 
@@ -137,9 +138,8 @@ export default function ProfilePage() {
 
   const initials = useMemo(() => {
     if (!user) return "U";
-    const parts = (user.fullName || "").trim().split(/\s+/).filter(Boolean);
-    const a = parts[0]?.[0] || "U";
-    const b = parts[1]?.[0] || "";
+    const a = (user.firstName || "").trim()[0] || "U";
+    const b = (user.lastName || "").trim()[0] || "";
     return (a + b).toUpperCase();
   }, [user]);
 
@@ -149,9 +149,12 @@ export default function ProfilePage() {
       await api("/auth/me", {
         method: "PATCH",
         body: JSON.stringify({
-          firstName: user.fullName?.split(" ")[0] || "",
-          lastName: user.fullName?.split(" ").slice(1).join(" ") || "",
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
           phone: user.phone || "",
+          country: user.country || "",
+          city: user.city || "",
+          address: user.address || "",
         }),
       });
       toast.success("Profile saved!");
@@ -205,7 +208,9 @@ export default function ProfilePage() {
                   {initials}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-base font-bold text-gray-900 truncate">{user.fullName}</p>
+                  <p className="text-base font-bold text-gray-900 truncate">
+                    {`${user.firstName || ""} ${user.lastName || ""}`.trim()}
+                  </p>
                   <p className="text-sm text-gray-500 truncate">{user.email}</p>
                 </div>
               </div>
@@ -334,10 +339,19 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <label className="flex flex-col gap-2">
-                  <span className="text-xs font-semibold text-gray-500">{t("fields.fullName")}</span>
+                  <span className="text-xs font-semibold text-gray-500">{t("fields.firstName")}</span>
                   <input
-                    value={user.fullName}
-                    onChange={(e) => setUser((u) => ({ ...u, fullName: e.target.value }))}
+                    value={user.firstName}
+                    onChange={(e) => setUser((u) => ({ ...u, firstName: e.target.value }))}
+                    className="h-11 px-4 rounded-2xl bg-white border border-gray-200 outline-none text-sm text-gray-900 focus:border-blue-400"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2">
+                  <span className="text-xs font-semibold text-gray-500">{t("fields.lastName")}</span>
+                  <input
+                    value={user.lastName}
+                    onChange={(e) => setUser((u) => ({ ...u, lastName: e.target.value }))}
                     className="h-11 px-4 rounded-2xl bg-white border border-gray-200 outline-none text-sm text-gray-900 focus:border-blue-400"
                   />
                 </label>
