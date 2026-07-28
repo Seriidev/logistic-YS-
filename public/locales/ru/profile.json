@@ -21,6 +21,8 @@
   "personalDetails": "Личные данные",
   "fields": {
     "fullName": "Полное имя",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
     "email": "Электронная почта",
     "phone": "Телефон",
     "country": "Страна",

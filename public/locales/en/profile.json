@@ -21,6 +21,8 @@
   "personalDetails": "Personal details",
   "fields": {
     "fullName": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
     "email": "Email",
     "phone": "Phone",
     "country": "Country",
