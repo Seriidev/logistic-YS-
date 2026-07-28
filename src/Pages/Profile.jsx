@@ -236,18 +236,6 @@ export default function ProfilePage() {
 
               <div className="flex flex-col gap-3">
                 <button
-                  className="w-full bg-white text-gray-900 text-sm font-semibold px-4 py-3 rounded-2xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => alert(t("actions.notificationsStub"))}
-                >
-                  {t("actions.notifications")}
-                </button>
-                <button
-                  className="w-full bg-white text-gray-900 text-sm font-semibold px-4 py-3 rounded-2xl border border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() => alert(t("actions.securityStub"))}
-                >
-                  {t("actions.security")}
-                </button>
-                <button
                   className="w-full bg-white text-red-600 text-sm font-semibold px-4 py-3 rounded-2xl border border-red-100 cursor-pointer hover:bg-red-50 transition-colors"
                   onClick={async () => {
                     await logoutUser();
