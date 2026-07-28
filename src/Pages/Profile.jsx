@@ -147,9 +147,10 @@ export default function ProfilePage() {
     setSaving(true);
     try {
       await api("/auth/me", {
-        method: "PUT",
+        method: "PATCH",
         body: JSON.stringify({
-          name: user.fullName,
+          firstName: user.fullName.split(" ")[0] || "",
+          lastName: user.fullName.split(" ").slice(1).join(" ") || "",
           phone: user.phone,
           country: user.country,
           city: user.city,
