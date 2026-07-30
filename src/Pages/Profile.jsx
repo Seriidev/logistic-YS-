@@ -55,6 +55,7 @@ export default function ProfilePage() {
     ])
       .then(([me, shipmentsData, walletData, txData]) => {
         setUser({
+          id: me.data?.id || "",
           firstName: me.data?.firstName || "",
           lastName: me.data?.lastName || "",
           email: me.data?.email || me.email || "",
@@ -185,23 +186,8 @@ export default function ProfilePage() {
           <span className="text-gray-900 font-medium">{t("breadcrumb.title")}</span>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">{t("title")}</h1>
-            <p className="text-sm text-gray-500 mt-1">{t("subtitle")}</p>
-          </div>
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={saving}
-            className="w-full sm:w-fit min-h-[44px] bg-blue-500 text-white text-xs font-bold uppercase tracking-widest px-6 sm:px-8 py-2.5 rounded-full border-none cursor-pointer hover:bg-blue-600 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
-          >
-            {saving ? t("saving") : t("save")}
-          </button>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-4 flex flex-col gap-4">
             <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-5 sm:p-8">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center font-extrabold text-lg">
@@ -246,6 +232,15 @@ export default function ProfilePage() {
                 </button>
               </div>
             </div>
+
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={saving}
+              className="w-full min-h-[44px] bg-blue-500 text-white text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-full border-none cursor-pointer hover:bg-blue-600 transition-colors duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {saving ? t("saving") : t("save")}
+            </button>
           </div>
 
           <div className="lg:col-span-8 flex flex-col gap-6">
@@ -257,8 +252,7 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <div className="flex items-start justify-between gap-4 mb-4">
-                    <h2 className="text-base font-bold flex items-center gap-2">
-                      <span aria-hidden="true">💰</span>
+                    <h2 className="text-xl sm:text-2xl font-bold">
                       My Wallet
                     </h2>
                     <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/20 text-xs font-bold tracking-wide">
@@ -272,6 +266,26 @@ export default function ProfilePage() {
                   <p className="text-sm text-white/80 mt-1.5 font-medium">
                     Bonus: ${Number(wallet?.bonusBalance ?? 0).toFixed(2)}
                   </p>
+
+                  <div className="flex items-center justify-between gap-3 mt-1.5">
+                    <p className="text-sm text-white/80 font-medium min-w-0 truncate">
+                      Your ID: {user?.id}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(String(user?.id || ""));
+                          toast.success("Copied!");
+                        } catch (_) {
+                          toast.error("Failed to copy");
+                        }
+                      }}
+                      className="text-sm font-semibold text-white/90 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-white shrink-0"
+                    >
+                      copy ID
+                    </button>
+                  </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-6">
                     <button
