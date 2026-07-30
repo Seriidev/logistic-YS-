@@ -85,7 +85,7 @@ export default function AirCargoBookingPage() {
             shippingCost: breakdown.total,
             currency: "USD",
             notes: formData.specialInstructions || "",
-            shipmentType: "AIR",
+            type: "AIR",
           }),
         });
         const tracking =
