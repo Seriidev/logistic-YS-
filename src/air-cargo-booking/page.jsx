@@ -12,6 +12,7 @@ import Footer from "../components/Footer";
 import { getBreakdown } from "./utils/getBreakdown";
 import { getPaymentMethod } from "./data/paymentMethods";
 import { getPaymentMethodLabel } from "../i18n/paymentMethodLabels";
+import { api } from "../utils/api";
 
 export default function AirCargoBookingPage() {
   const { t } = useTranslation(["airCargoBooking", "booking"]);
@@ -23,6 +24,7 @@ export default function AirCargoBookingPage() {
   const [formData, setFormData] = useState({});
   const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState({});
+  const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -62,6 +64,38 @@ export default function AirCargoBookingPage() {
       ? getPaymentMethodLabel(t, selectedMethod, "name")
       : t("common.notSet", { ns: "booking" }),
     total: breakdown.total,
+    ...(apiTrackingNumber ? { trackingNumber: apiTrackingNumber } : {}),
+  };
+
+  const handleEconomyPay = async () => {
+    if (service === "economy") {
+      try {
+        const res = await api("/shipments", {
+          method: "POST",
+          body: JSON.stringify({
+            recipientName: formData.recipientName,
+            recipientEmail: formData.recipientEmail,
+            description: formData.specialInstructions || "",
+            weight: Number(formData.weight) || 0,
+            dimensions: [formData.length, formData.width, formData.height].filter(Boolean).join("x"),
+            quantity: 1,
+            originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
+            destinationAddress: formData.destinationCountry,
+            declaredValue: Number(formData.declaredValue) || 0,
+            shippingCost: breakdown.total,
+            currency: "USD",
+            notes: formData.specialInstructions || "",
+            shipmentType: "AIR",
+          }),
+        });
+        const tracking =
+          res?.data?.trackingNumber || res?.trackingNumber || null;
+        if (tracking) setApiTrackingNumber(tracking);
+      } catch (err) {
+        console.error("Failed to create economy shipment:", err);
+      }
+    }
+    goToStep(4);
   };
 
   return (
@@ -130,7 +164,7 @@ export default function AirCargoBookingPage() {
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
               onBack={() => goToStep(2)}
-              onPay={() => goToStep(4)}
+              onPay={service === "economy" ? handleEconomyPay : () => goToStep(4)}
               amount={breakdown.total}
             />
           )}
