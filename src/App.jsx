@@ -26,7 +26,7 @@ import ShippingMethodsPage from "./Pages/ShippingMethod";
 import OnlineStoresPage from "./Pages/OnlineStores";
 import AboutUsPage from "./Pages/AboutUs";
 import ProhibitedItemsPage from "./Pages/Prohibited";
-import { CalculatePage, CreateShipmentPage } from "./Pages/shipment";
+import { CalculatePage, CreateShipmentPage, ShipmentDetailsPage } from "./Pages/shipment";
 import ProfilePage from "./Pages/Profile";
 import { AuthPage } from "./Pages/auth";
 import { NotFoundPage, ServerErrorPage } from "./Pages/errors";
@@ -85,6 +85,7 @@ function App() {
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/shipments/:id" element={<ShipmentDetailsPage />} />
         <Route path="/500" element={<ServerErrorPage />} />
         <Route path="/505" element={<ServerErrorPage />} />
         <Route path="*" element={<NotFoundPage />} />

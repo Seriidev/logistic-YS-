@@ -17,7 +17,9 @@ function isValid(form) {
     req(form.weight) &&
     req(form.length) &&
     req(form.width) &&
-    req(form.height)
+    req(form.height) &&
+    req(form.recipientName) &&
+    req(form.recipientEmail)
   );
 }
 
@@ -91,6 +93,27 @@ export default function ExpressForm({ formData, onChange, onNext }) {
               <label htmlFor="height" className={labelClass}>{t("form.fields.height", { ns: "booking" })}</label>
               <input id="height" type="number" min="0" placeholder={t("form.placeholders.zero", { ns: "booking" })}
                 value={formData.height || ""} onChange={update("height")} className={inputClass} />
+            </div>
+          </div>
+
+          <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">
+            Recipient Information
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6">
+            <div className="min-w-0">
+              <label htmlFor="recipientName" className={labelClass}>Recipient Name *</label>
+              <input id="recipientName" type="text" placeholder="Full name"
+                value={formData.recipientName || ""} onChange={update("recipientName")} className={inputClass} />
+            </div>
+            <div className="min-w-0">
+              <label htmlFor="recipientEmail" className={labelClass}>Recipient Email *</label>
+              <input id="recipientEmail" type="email" placeholder="email@example.com"
+                value={formData.recipientEmail || ""} onChange={update("recipientEmail")} className={inputClass} />
+            </div>
+            <div className="min-w-0 sm:col-span-2">
+              <label htmlFor="declaredValue" className={labelClass}>{t("form.fields.declaredValue", { ns: "booking" })}</label>
+              <input id="declaredValue" type="number" min="0" step="0.01" placeholder={t("form.placeholders.zero", { ns: "booking" })}
+                value={formData.declaredValue ?? 0} onChange={update("declaredValue")} className={inputClass} />
             </div>
           </div>
 

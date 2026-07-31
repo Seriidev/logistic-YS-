@@ -27,6 +27,7 @@ export default function ProfilePage() {
   const { t } = useTranslation("profile");
   const [user, setUser] = useState(null);
   const [shipments, setShipments] = useState([]);
+  const [totalShipments, setTotalShipments] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -65,6 +66,7 @@ export default function ProfilePage() {
           address: me.data?.address || me.address || "",
         });
         setShipments(shipmentsData.data?.data || []);
+        setTotalShipments(shipmentsData.data?.meta?.total ?? 0);
 
         if (walletData?.__walletError) {
           const err = walletData.__walletError;
@@ -134,8 +136,8 @@ export default function ProfilePage() {
   const stats = useMemo(() => {
     const inTransit = shipments.filter((s) => String(s.status || "").toLowerCase().includes("transit")).length;
     const delivered = shipments.filter((s) => String(s.status || "").toLowerCase().includes("deliver")).length;
-    return { total: shipments.length, inTransit, delivered };
-  }, [shipments]);
+    return { total: totalShipments, inTransit, delivered };
+  }, [shipments, totalShipments]);
 
   const initials = useMemo(() => {
     if (!user) return "U";
@@ -425,7 +427,7 @@ export default function ProfilePage() {
                       <StatusPill status={s.status} />
                       <button
                         className="text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full border-none cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors"
-                        onClick={() => alert(t("shipments.detailsStub", { id: s.id }))}
+                        onClick={() => { window.location.href = `/shipments/${s.id}`; }}
                       >
                         {t("shipments.details")}
                       </button>

@@ -98,6 +98,37 @@ export default function AirCargoBookingPage() {
     goToStep(4);
   };
 
+  const handleExpressPay = async () => {
+    if (service === "express") {
+      try {
+        const res = await api("/shipments", {
+          method: "POST",
+          body: JSON.stringify({
+            recipientName: formData.recipientName,
+            recipientEmail: formData.recipientEmail,
+            description: formData.specialInstructions || "",
+            weight: Number(formData.weight) || 0,
+            dimensions: [formData.length, formData.width, formData.height].filter(Boolean).join("x"),
+            quantity: 1,
+            originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
+            destinationAddress: formData.destinationCountry,
+            declaredValue: Number(formData.declaredValue) || 0,
+            shippingCost: breakdown.total,
+            currency: "USD",
+            notes: formData.specialInstructions || "",
+            type: "AIR",
+          }),
+        });
+        const tracking =
+          res?.data?.trackingNumber || res?.trackingNumber || null;
+        if (tracking) setApiTrackingNumber(tracking);
+      } catch (err) {
+        console.error("Failed to create express shipment:", err);
+      }
+    }
+    goToStep(4);
+  };
+
   return (
     <>
       <main className="min-w-0 bg-gradient-to-b from-blue-50/60 to-white">
@@ -164,7 +195,7 @@ export default function AirCargoBookingPage() {
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
               onBack={() => goToStep(2)}
-              onPay={service === "economy" ? handleEconomyPay : () => goToStep(4)}
+              onPay={service === "economy" ? handleEconomyPay : handleExpressPay}
               amount={breakdown.total}
             />
           )}
