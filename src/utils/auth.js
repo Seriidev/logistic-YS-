@@ -67,3 +67,21 @@ export function getStoredUser() {
     return null;
   }
 }
+
+export async function refreshAccessToken() {
+  const refreshToken = localStorage.getItem(REFRESH_KEY);
+  if (!refreshToken) throw new Error("No refresh token");
+
+  const res = await fetch(BASE_URL + "/auth/refresh", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ refreshToken }),
+  });
+  if (!res.ok) throw await res.json();
+  const json = await res.json();
+  const newAccessToken = json.data.tokens.accessToken;
+  const newRefreshToken = json.data.tokens.refreshToken;
+  localStorage.setItem(TOKEN_KEY, newAccessToken);
+  localStorage.setItem(REFRESH_KEY, newRefreshToken);
+  return newAccessToken;
+}

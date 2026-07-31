@@ -28,6 +28,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [shipments, setShipments] = useState([]);
   const [totalShipments, setTotalShipments] = useState(0);
+  const [shipmentStats, setShipmentStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -53,8 +54,9 @@ export default function ProfilePage() {
       api("/shipments?limit=3&page=1"),
       api("/wallet/me").catch((err) => ({ __walletError: err })),
       api("/wallet/transactions?limit=3").catch(() => ({ data: [] })),
+      api("/shipments/stats").catch((err) => ({ __statsError: err })),
     ])
-      .then(([me, shipmentsData, walletData, txData]) => {
+      .then(([me, shipmentsData, walletData, txData, statsData]) => {
         setUser({
           id: me.data?.id || "",
           firstName: me.data?.firstName || "",
@@ -86,6 +88,11 @@ export default function ProfilePage() {
             ? txData.data
             : [];
         setTransactions(txList.slice(0, 3));
+
+        console.log("shipments/stats response:", statsData);
+        if (!statsData?.__statsError) {
+          setShipmentStats(statsData?.data ?? statsData ?? null);
+        }
       })
       .catch(() => setError("Failed to load profile"))
       .finally(() => {
@@ -134,10 +141,17 @@ export default function ProfilePage() {
   };
 
   const stats = useMemo(() => {
+    if (shipmentStats) {
+      return {
+        total: Number(shipmentStats?.total ?? shipmentStats?.totalShipments ?? 0) || 0,
+        inTransit: Number(shipmentStats?.inTransit ?? shipmentStats?.in_transit ?? 0) || 0,
+        delivered: Number(shipmentStats?.delivered ?? 0) || 0,
+      };
+    }
     const inTransit = shipments.filter((s) => String(s.status || "").toLowerCase().includes("transit")).length;
     const delivered = shipments.filter((s) => String(s.status || "").toLowerCase().includes("deliver")).length;
     return { total: totalShipments, inTransit, delivered };
-  }, [shipments, totalShipments]);
+  }, [shipments, totalShipments, shipmentStats]);
 
   const initials = useMemo(() => {
     if (!user) return "U";
