@@ -98,7 +98,7 @@ export default function SuccessStep({ booking }) {
     const rand = mulberry32((Date.now() ^ hashString(JSON.stringify(booking || {}))) >>> 0);
     const digits = (n) => Array.from({ length: n }, () => Math.floor(rand() * 10)).join("");
     return {
-      trackingNumber: `YU 00 0000 ${digits(4)} ${digits(4)} USS0`,
+      trackingNumber: booking?.trackingNumber || `YU 00 0000 ${digits(4)} ${digits(4)} USS0`,
       shipmentNumber: `TRK-${digits(6)}`,
     };
   }, [booking]);

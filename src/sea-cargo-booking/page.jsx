@@ -12,6 +12,7 @@ import Footer from "../components/Footer";
 import { getBreakdown } from "./utils/getBreakdown";
 import { getPaymentMethod } from "./data/paymentMethods";
 import { getPaymentMethodLabel } from "../i18n/paymentMethodLabels";
+import { api } from "../utils/api";
 
 function defaultsFor(service) {
   const shared = { weightUnit: "kg", deliveryType: "port-port" };
@@ -29,6 +30,7 @@ export default function SeaCargoBookingPage() {
   const [formData, setFormData] = useState(defaultsFor(initialService));
   const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState({});
+  const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -82,6 +84,36 @@ export default function SeaCargoBookingPage() {
       ? getPaymentMethodLabel(t, selectedMethod, "name")
       : t("common.notSet", { ns: "booking" }),
     total: breakdown.total,
+    ...(apiTrackingNumber ? { trackingNumber: apiTrackingNumber } : {}),
+  };
+
+  const handleSeaPay = async () => {
+    try {
+      const res = await api("/shipments", {
+        method: "POST",
+        body: JSON.stringify({
+          recipientName: formData.recipientName,
+          recipientEmail: formData.recipientEmail,
+          description: formData.commodityDescription || "",
+          weight: Number(formData.weight) || 0,
+          dimensions: "",
+          quantity: service === "lcl" ? (Number(formData.totalUnits) || 1) : 1,
+          originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
+          destinationAddress: formData.destinationCountry,
+          declaredValue: Number(formData.declaredValue) || 0,
+          shippingCost: breakdown.total,
+          currency: "USD",
+          notes: formData.commodityDescription || "",
+          type: "SEA",
+        }),
+      });
+      const tracking =
+        res?.data?.trackingNumber || res?.trackingNumber || null;
+      if (tracking) setApiTrackingNumber(tracking);
+    } catch (err) {
+      console.error("Failed to create sea shipment:", err);
+    }
+    goToStep(4);
   };
 
   return (
@@ -140,7 +172,7 @@ export default function SeaCargoBookingPage() {
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
               onBack={() => goToStep(2)}
-              onPay={() => goToStep(4)}
+              onPay={handleSeaPay}
               amount={breakdown.total}
             />
           )}

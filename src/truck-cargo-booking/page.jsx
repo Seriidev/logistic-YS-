@@ -12,6 +12,7 @@ import Footer from "../components/Footer";
 import { getBreakdown } from "./utils/getBreakdown";
 import { getPaymentMethod, getCountry } from "./data/shippingOptions";
 import { getPaymentMethodLabel } from "../i18n/paymentMethodLabels";
+import { api } from "../utils/api";
 
 function defaultsFor(service) {
   const shared = { country: "asia", category: "generalGoods" };
@@ -29,6 +30,7 @@ export default function TruckCargoBookingPage() {
   const [formData, setFormData] = useState(defaultsFor(initialService));
   const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState({});
+  const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -79,6 +81,38 @@ export default function TruckCargoBookingPage() {
       ? getPaymentMethodLabel(t, selectedMethod, "name")
       : t("common.notSet", { ns: "booking" }),
     total: breakdown.total,
+    ...(apiTrackingNumber ? { trackingNumber: apiTrackingNumber } : {}),
+  };
+
+  const handleTruckPay = async () => {
+    try {
+      const res = await api("/shipments", {
+        method: "POST",
+        body: JSON.stringify({
+          recipientName: formData.recipientName,
+          recipientEmail: formData.recipientEmail,
+          description: formData.commodityDescription || "",
+          weight: Number(formData.weight) || 0,
+          dimensions: service === "ltl"
+            ? [formData.length, formData.width, formData.height].filter(Boolean).join("x")
+            : "",
+          quantity: 1,
+          originAddress: `${formData.country}, ${formData.fromLocation}`,
+          destinationAddress: service === "ltl" ? formData.receiverInfo : formData.shipperInfo,
+          declaredValue: Number(formData.declaredValue) || 0,
+          shippingCost: breakdown.total,
+          currency: "USD",
+          notes: formData.commodityDescription || "",
+          type: "TRUCK",
+        }),
+      });
+      const tracking =
+        res?.data?.trackingNumber || res?.trackingNumber || null;
+      if (tracking) setApiTrackingNumber(tracking);
+    } catch (err) {
+      console.error("Failed to create truck shipment:", err);
+    }
+    goToStep(4);
   };
 
   return (
@@ -144,7 +178,7 @@ export default function TruckCargoBookingPage() {
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
               onBack={() => goToStep(2)}
-              onPay={() => goToStep(4)}
+              onPay={handleTruckPay}
               amount={breakdown.total}
             />
           )}

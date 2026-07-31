@@ -13,7 +13,8 @@ function isValid(f) {
   const req = (v) => Boolean(String(v || "").trim());
   return (
     req(f.country) && req(f.fromLocation) && req(f.shipperInfo) && req(f.dateOfShipment) &&
-    req(f.weight) && req(f.hsCode) && req(f.category) && req(f.receiverInfo) && req(f.deliveryType)
+    req(f.weight) && req(f.hsCode) && req(f.category) && req(f.receiverInfo) && req(f.deliveryType) &&
+    req(f.recipientName) && req(f.recipientEmail)
   );
 }
 
@@ -152,6 +153,20 @@ export default function FTLForm({ formData, onChange, onNext }) {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+
+          <h3 className="text-sm font-bold text-gray-900 mb-3 uppercase tracking-wide">Recipient Information</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6">
+            <div className="min-w-0">
+              <label htmlFor="recipientName" className={labelClass}>Recipient Name *</label>
+              <input id="recipientName" type="text" placeholder="Full name"
+                value={formData.recipientName || ""} onChange={update("recipientName")} className={inputClass} />
+            </div>
+            <div className="min-w-0">
+              <label htmlFor="recipientEmail" className={labelClass}>Recipient Email *</label>
+              <input id="recipientEmail" type="email" placeholder="email@example.com"
+                value={formData.recipientEmail || ""} onChange={update("recipientEmail")} className={inputClass} />
             </div>
           </div>
 

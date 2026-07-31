@@ -14,6 +14,8 @@ export function validateLCL(form = {}) {
     "weight",
     "commodityType",
     "deliveryType",
+    "recipientName",
+    "recipientEmail",
   ]);
 }
 
@@ -27,6 +29,8 @@ export function validateFCL(form = {}) {
     "containerType",
     "hsCode",
     "deliveryType",
+    "recipientName",
+    "recipientEmail",
   ]);
 }
 
