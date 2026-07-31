@@ -1,5 +1,7 @@
 import { refreshAccessToken } from "./auth";
 
+let refreshPromise = null;
+
 const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export const api = async (path, options = {}) => {
@@ -15,7 +17,12 @@ export const api = async (path, options = {}) => {
 
   if (res.status === 401) {
     try {
-      const newToken = await refreshAccessToken();
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      const newToken = await refreshPromise;
       res = await fetch(BASE_URL + path, {
         headers: {
           "Content-Type": "application/json",
