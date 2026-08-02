@@ -5,7 +5,7 @@ import { FaApple, FaGoogle } from "react-icons/fa";
 import Footer from "../../components/Footer";
 import PasswordInput from "../../components/PasswordInput";
 import PhoneInputField from "../../components/PhoneInputField";
-import { loginUser, registerUser } from "../../utils/auth";
+import { loginUser, registerUser, loginWithGoogle } from "../../utils/auth";
 import { getPhoneValidationError } from "../../utils/phone";
 import AuthIllustration from "./AuthIllustration";
 
@@ -108,6 +108,32 @@ export default function AuthPage() {
     }
   };
 
+  const handleGoogleCredential = async (response) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await loginWithGoogle(response.credential);
+      window.location.href = "/profile";
+    } catch (err) {
+      setError(err?.message || "Invalid email or password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleClick = () => {
+    setError(null);
+    if (!window.google?.accounts?.id) {
+      setError("Google Sign-In is not available. Please try again.");
+      return;
+    }
+    window.google.accounts.id.initialize({
+      client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+    });
+    window.google.accounts.id.prompt();
+  };
+
   const breadcrumbLabel = mode === "signup" ? t("breadcrumb.signUp") : t("breadcrumb.logIn");
   const illustrationSrc = mode === "signup" ? "/signup.png" : "/login.png";
   const illustrationAlt = mode === "signup" ? t("illustration.signUpAlt") : t("illustration.loginAlt");
@@ -196,6 +222,7 @@ export default function AuthPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         type="button"
+                        onClick={handleGoogleClick}
                         className="flex h-12 items-center justify-center rounded-xl bg-[#f0f2f5] border-none cursor-pointer hover:bg-gray-200 transition-colors"
                         aria-label={t("social.google")}
                       >

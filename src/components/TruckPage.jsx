@@ -9,6 +9,19 @@ const STATUS_COLORS = {
   blue: { bg: "bg-blue-100", text: "text-blue-600" },
   green: { bg: "bg-green-100", text: "text-green-600" },
   red: { bg: "bg-red-100", text: "text-red-600" },
+  gray: { bg: "bg-gray-100", text: "text-gray-600" },
+  yellow: { bg: "bg-amber-100", text: "text-amber-600" },
+};
+
+const STATUS_TO_COLOR = {
+  DRAFT: "gray",
+  PENDING: "yellow",
+  PROCESSING: "yellow",
+  READY_FOR_PICKUP: "blue",
+  IN_TRANSIT: "blue",
+  DELIVERED: "green",
+  RETURNED: "red",
+  CANCELLED: "red",
 };
 
 export default function TrackPage() {
@@ -63,7 +76,8 @@ export default function TrackPage() {
     setError(null);
     try {
       const apiResult = await api(`/tracking/${trackingNumber.trim()}`);
-      setResult(apiResult);
+      setResult(apiResult.data ?? apiResult);
+      console.log("tracking response:", apiResult.data ?? apiResult);
       setNotFound(false);
     } catch (err) {
       setError("Shipment not found. Please check the tracking number.");
@@ -171,50 +185,52 @@ export default function TrackPage() {
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.status")}</p>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${STATUS_COLORS[result.statusColor].bg} ${STATUS_COLORS[result.statusColor].text}`}>
+                <span className={`text-xs font-bold px-3 py-1 rounded-full ${STATUS_COLORS[STATUS_TO_COLOR[result.status] || "gray"].bg} ${STATUS_COLORS[STATUS_TO_COLOR[result.status] || "gray"].text}`}>
                   {result.status}
                 </span>
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.from")}</p>
-                <p className="text-sm font-semibold text-gray-900">{result.from}</p>
+                <p className="text-sm font-semibold text-gray-900">{result.originAddress || "—"}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.to")}</p>
-                <p className="text-sm font-semibold text-gray-900">{result.to}</p>
+                <p className="text-sm font-semibold text-gray-900">{result.destinationAddress || "—"}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.type")}</p>
-                <p className="text-sm font-semibold text-gray-900">{result.type}</p>
+                <p className="text-sm font-semibold text-gray-900">{result.type || "—"}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.eta")}</p>
-                <p className="text-sm font-semibold text-blue-500">{result.eta}</p>
+                <p className="text-sm font-semibold text-blue-500">—</p>
               </div>
             </div>
 
-            <div className="tracking-steps">
-              {result.steps.map((step, i) => (
-                <div key={i} className="flex items-center flex-1 min-w-[5.5rem] sm:min-w-0 shrink-0 sm:shrink">
-                  <div className="flex flex-col items-center flex-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.done ? "bg-blue-500" : "bg-gray-100"}`}>
-                      {step.done ? (
-                        <LuCheck className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-gray-300" />
-                      )}
+            {Array.isArray(result.steps) && result.steps.length > 0 && (
+              <div className="tracking-steps">
+                {result.steps.map((step, i) => (
+                  <div key={i} className="flex items-center flex-1 min-w-[5.5rem] sm:min-w-0 shrink-0 sm:shrink">
+                    <div className="flex flex-col items-center flex-1">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.done ? "bg-blue-500" : "bg-gray-100"}`}>
+                        {step.done ? (
+                          <LuCheck className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                        ) : (
+                          <div className="w-2 h-2 rounded-full bg-gray-300" />
+                        )}
+                      </div>
+                      <p className={`text-xs font-semibold mt-2 text-center ${step.done ? "text-blue-500" : "text-gray-400"}`}>
+                        {step.label}
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-0.5 text-center">{step.date}</p>
                     </div>
-                    <p className={`text-xs font-semibold mt-2 text-center ${step.done ? "text-blue-500" : "text-gray-400"}`}>
-                      {step.label}
-                    </p>
-                    <p className="text-[10px] text-gray-400 mt-0.5 text-center">{step.date}</p>
+                    {i < result.steps.length - 1 && (
+                      <div className={`h-0.5 flex-1 -mt-8 ${result.steps[i + 1].done ? "bg-blue-500" : "bg-gray-200"}`} />
+                    )}
                   </div>
-                  {i < result.steps.length - 1 && (
-                    <div className={`h-0.5 flex-1 -mt-8 ${result.steps[i + 1].done ? "bg-blue-500" : "bg-gray-200"}`} />
-                  )}
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

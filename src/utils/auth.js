@@ -85,3 +85,20 @@ export async function refreshAccessToken() {
   localStorage.setItem(REFRESH_KEY, newRefreshToken);
   return newAccessToken;
 }
+
+export async function loginWithGoogle(idToken) {
+  const res = await fetch(BASE_URL + "/auth/google", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken, role: "CUSTOMER" }),
+  });
+  if (!res.ok) throw await res.json();
+  const json = await res.json();
+  const token = json.data.tokens.accessToken;
+  const refresh = json.data.tokens.refreshToken;
+  const user = json.data.user;
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(REFRESH_KEY, refresh);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  return user;
+}

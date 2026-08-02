@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast, { Toaster } from "react-hot-toast";
+import { LuBell } from "react-icons/lu";
 import Footer from "../components/Footer";
 import PhoneInputField from "../components/PhoneInputField";
 import { api } from "../utils/api";
@@ -41,6 +42,9 @@ export default function ProfilePage() {
   const [toUserId, setToUserId] = useState("");
   const [amount, setAmount] = useState("");
   const [transferring, setTransferring] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Load user data from API
   useEffect(() => {
@@ -55,8 +59,9 @@ export default function ProfilePage() {
       api("/wallet/me").catch((err) => ({ __walletError: err })),
       api("/wallet/transactions?limit=3").catch(() => ({ data: [] })),
       api("/shipments/stats").catch((err) => ({ __statsError: err })),
+      api("/notifications/unread-count").catch((err) => ({ __notifError: err })),
     ])
-      .then(([me, shipmentsData, walletData, txData, statsData]) => {
+      .then(([me, shipmentsData, walletData, txData, statsData, notifCountData]) => {
         setUser({
           id: me.data?.id || "",
           firstName: me.data?.firstName || "",
@@ -92,6 +97,19 @@ export default function ProfilePage() {
         console.log("shipments/stats response:", statsData);
         if (!statsData?.__statsError) {
           setShipmentStats(statsData?.data ?? statsData ?? null);
+        }
+
+        console.log("unread-count response:", notifCountData);
+        if (!notifCountData?.__notifError) {
+          setUnreadCount(
+            Number(
+              notifCountData?.data?.count ??
+                notifCountData?.data?.unreadCount ??
+                notifCountData?.count ??
+                notifCountData?.unreadCount ??
+                0,
+            ) || 0,
+          );
         }
       })
       .catch(() => setError("Failed to load profile"))
@@ -137,6 +155,55 @@ export default function ProfilePage() {
       toast.error(err?.message || "Transfer failed");
     } finally {
       setTransferring(false);
+    }
+  };
+
+  const toggleNotifications = async () => {
+    const opening = !showNotifications;
+    setShowNotifications(opening);
+    if (opening && notifications.length === 0) {
+      try {
+        const res = await api("/notifications?limit=10");
+        console.log("notifications list response:", res);
+        const list = Array.isArray(res?.data?.data)
+          ? res.data.data
+          : Array.isArray(res?.data)
+            ? res.data
+            : Array.isArray(res)
+              ? res
+              : [];
+        setNotifications(list);
+      } catch (err) {
+        console.log("notifications list error:", err);
+        setNotifications([]);
+      }
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    try {
+      await api("/notifications/read-all", { method: "PATCH" });
+      setUnreadCount(0);
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, isRead: true, read: true })),
+      );
+    } catch (err) {
+      console.log("mark-all-read error:", err);
+    }
+  };
+
+  const markNotificationRead = async (id) => {
+    if (!id) return;
+    try {
+      await api(`/notifications/${id}/read`, { method: "PATCH" });
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id ? { ...n, isRead: true, read: true } : n,
+        ),
+      );
+      setUnreadCount((c) => Math.max(0, c - 1));
+    } catch (err) {
+      console.log("mark-read error:", err);
     }
   };
 
@@ -194,12 +261,77 @@ export default function ProfilePage() {
   return (
     <>
       <section className="page-container py-4 sm:py-6 min-w-0">
-        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+        <div className="flex items-center gap-2 text-sm text-gray-500 mb-6 relative">
           <a href="/" className="hover:text-blue-500 no-underline text-gray-500">
             {t("common:common.main")}
           </a>
           <span>›</span>
           <span className="text-gray-900 font-medium">{t("breadcrumb.title")}</span>
+
+          <div className="ml-auto relative">
+            <button
+              type="button"
+              onClick={toggleNotifications}
+              className="relative flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border-none cursor-pointer hover:bg-gray-200 transition-colors text-gray-700"
+              aria-label="Notifications"
+            >
+              <LuBell className="w-5 h-5" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {showNotifications && (
+              <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(100vw-2rem,22rem)] bg-white border border-gray-100 rounded-2xl shadow-lg overflow-hidden">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-100">
+                  <p className="text-sm font-bold text-gray-900">Notifications</p>
+                  <button
+                    type="button"
+                    onClick={markAllNotificationsRead}
+                    className="text-xs font-semibold text-blue-500 bg-transparent border-none cursor-pointer hover:text-blue-600"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <p className="px-4 py-6 text-sm text-gray-400 text-center">No notifications</p>
+                  ) : (
+                    notifications.map((n) => {
+                      const isUnread = !(n.isRead ?? n.read ?? false);
+                      const title = n.title || n.subject || n.type || "Notification";
+                      const message = n.message || n.body || n.content || "";
+                      const dateRaw = n.createdAt || n.date || n.updatedAt;
+                      return (
+                        <button
+                          key={n.id || title}
+                          type="button"
+                          onClick={() => markNotificationRead(n.id)}
+                          className={`w-full text-left px-4 py-3 border-none border-b border-gray-50 last:border-b-0 cursor-pointer transition-colors ${
+                            isUnread ? "bg-blue-50/60 hover:bg-blue-50" : "bg-white hover:bg-gray-50"
+                          }`}
+                        >
+                          <p className={`text-sm ${isUnread ? "font-bold text-gray-900" : "font-medium text-gray-700"}`}>
+                            {title}
+                          </p>
+                          {message ? (
+                            <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{message}</p>
+                          ) : null}
+                          {dateRaw ? (
+                            <p className="text-[10px] text-gray-400 mt-1">
+                              {new Date(dateRaw).toLocaleString()}
+                            </p>
+                          ) : null}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

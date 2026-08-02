@@ -25,6 +25,7 @@ export default function AirCargoBookingPage() {
   const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState({});
   const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
+  const [attachedFile, setAttachedFile] = useState(null);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -91,6 +92,20 @@ export default function AirCargoBookingPage() {
         const tracking =
           res?.data?.trackingNumber || res?.trackingNumber || null;
         if (tracking) setApiTrackingNumber(tracking);
+        const shipmentId = res?.data?.id || res?.id || null;
+        if (shipmentId && attachedFile) {
+          try {
+            const formData = new FormData();
+            formData.append("file", attachedFile);
+            formData.append("type", "OTHER");
+            await api(`/shipments/${shipmentId}/documents`, {
+              method: "POST",
+              body: formData,
+            });
+          } catch (uploadErr) {
+            console.error("Document upload failed (shipment was still created successfully):", uploadErr);
+          }
+        }
       } catch (err) {
         console.error("Failed to create economy shipment:", err);
       }
@@ -122,6 +137,20 @@ export default function AirCargoBookingPage() {
         const tracking =
           res?.data?.trackingNumber || res?.trackingNumber || null;
         if (tracking) setApiTrackingNumber(tracking);
+        const shipmentId = res?.data?.id || res?.id || null;
+        if (shipmentId && attachedFile) {
+          try {
+            const formData = new FormData();
+            formData.append("file", attachedFile);
+            formData.append("type", "OTHER");
+            await api(`/shipments/${shipmentId}/documents`, {
+              method: "POST",
+              body: formData,
+            });
+          } catch (uploadErr) {
+            console.error("Document upload failed (shipment was still created successfully):", uploadErr);
+          }
+        }
       } catch (err) {
         console.error("Failed to create express shipment:", err);
       }
@@ -178,6 +207,16 @@ export default function AirCargoBookingPage() {
                   onNext={() => goToStep(2)}
                 />
               )}
+              <div className="max-w-5xl mx-auto mt-4 min-w-0">
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Attach document (optional)
+                </label>
+                <input
+                  type="file"
+                  onChange={(e) => setAttachedFile(e.target.files?.[0] || null)}
+                  className="w-full h-11 sm:h-12 px-4 rounded-xl border border-gray-200 text-sm text-gray-900 outline-none bg-white focus:border-blue-400 transition-colors min-w-0 font-[inherit]"
+                />
+              </div>
             </>
           )}
 

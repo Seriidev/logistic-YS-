@@ -9,7 +9,7 @@ export const api = async (path, options = {}) => {
 
   let res = await fetch(BASE_URL + path, {
     headers: {
-      "Content-Type": "application/json",
+      ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     ...options,
@@ -25,7 +25,7 @@ export const api = async (path, options = {}) => {
       const newToken = await refreshPromise;
       res = await fetch(BASE_URL + path, {
         headers: {
-          "Content-Type": "application/json",
+          ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
           ...(newToken ? { Authorization: `Bearer ${newToken}` } : {}),
         },
         ...options,
