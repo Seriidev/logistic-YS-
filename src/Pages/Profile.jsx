@@ -434,6 +434,76 @@ export default function ProfilePage() {
             >
               {saving ? t("saving") : t("save")}
             </button>
+
+            <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm text-gray-700 font-medium min-w-0 truncate">
+                  Referral code: {wallet?.referralCode || wallet?.referral_code || user?.id}
+                </p>
+                <button
+                  type="button"
+                  onClick={() =>
+                    copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
+                  }
+                  className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600 shrink-0"
+                >
+                  copy
+                </button>
+              </div>
+
+              <div>
+                <p className="text-sm font-semibold text-gray-900">
+                  Referred users ({referrals.length})
+                </p>
+                {referrals.length > 0 && (
+                  <div className="mt-2 flex flex-col gap-1.5">
+                    {referrals.map((r, i) => {
+                      const name =
+                        r?.name ||
+                        r?.fullName ||
+                        [r?.firstName, r?.lastName].filter(Boolean).join(" ") ||
+                        r?.email ||
+                        r?.user?.email ||
+                        r?.user?.name ||
+                        "User";
+                      const email = r?.email || r?.user?.email || "";
+                      return (
+                        <div
+                          key={r?.id || r?.userId || i}
+                          className="bg-white rounded-xl px-3.5 py-2 border border-gray-100"
+                        >
+                          <p className="text-sm font-medium text-gray-900 truncate">{name}</p>
+                          {email && name !== email ? (
+                            <p className="text-xs text-gray-500 truncate">{email}</p>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  value={referralCodeInput}
+                  onChange={(e) => setReferralCodeInput(e.target.value)}
+                  placeholder="Enter referral code"
+                  className="flex-1 min-w-0 h-10 px-3 rounded-xl bg-white border border-gray-200 outline-none text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-400"
+                />
+                <button
+                  type="button"
+                  onClick={applyReferralCode}
+                  disabled={!referralCodeInput.trim()}
+                  className="h-10 px-4 rounded-full bg-blue-500 text-white text-sm font-bold border-none cursor-pointer hover:bg-blue-600 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Apply
+                </button>
+              </div>
+              {referralMessage && (
+                <p className="text-xs text-gray-600 font-medium">{referralMessage}</p>
+              )}
+            </div>
           </div>
 
           <div className="lg:col-span-8 flex flex-col gap-6">
@@ -471,76 +541,6 @@ export default function ProfilePage() {
                     >
                       copy ID
                     </button>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-white/20 flex flex-col gap-3">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm text-white/80 font-medium min-w-0 truncate">
-                        Referral code: {wallet?.referralCode || wallet?.referral_code || user?.id}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
-                        }
-                        className="text-sm font-semibold text-white/90 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-white shrink-0"
-                      >
-                        copy
-                      </button>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-semibold text-white/90">
-                        Referred users ({referrals.length})
-                      </p>
-                      {referrals.length > 0 && (
-                        <div className="mt-2 flex flex-col gap-1.5">
-                          {referrals.map((r, i) => {
-                            const name =
-                              r?.name ||
-                              r?.fullName ||
-                              [r?.firstName, r?.lastName].filter(Boolean).join(" ") ||
-                              r?.email ||
-                              r?.user?.email ||
-                              r?.user?.name ||
-                              "User";
-                            const email = r?.email || r?.user?.email || "";
-                            return (
-                              <div
-                                key={r?.id || r?.userId || i}
-                                className="bg-white/10 rounded-xl px-3.5 py-2"
-                              >
-                                <p className="text-sm font-medium text-white truncate">{name}</p>
-                                {email && name !== email ? (
-                                  <p className="text-xs text-white/70 truncate">{email}</p>
-                                ) : null}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="text"
-                        value={referralCodeInput}
-                        onChange={(e) => setReferralCodeInput(e.target.value)}
-                        placeholder="Enter referral code"
-                        className="flex-1 min-w-0 h-10 px-3 rounded-xl bg-white/15 border border-white/20 outline-none text-sm text-white placeholder:text-white/50 focus:border-white/50"
-                      />
-                      <button
-                        type="button"
-                        onClick={applyReferralCode}
-                        disabled={!referralCodeInput.trim()}
-                        className="h-10 px-4 rounded-full bg-white text-blue-600 text-sm font-bold border-none cursor-pointer hover:bg-blue-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    {referralMessage && (
-                      <p className="text-xs text-white/90 font-medium">{referralMessage}</p>
-                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-6">
