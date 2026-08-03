@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   LuBriefcase,
@@ -103,6 +104,7 @@ const WHY_US = [
 
 export default function AboutUsPage() {
   const { t } = useTranslation("aboutUs");
+  const navigate = useNavigate();
   const [started, setStarted] = useState(false);
   const statsRef = useRef(null);
 
@@ -145,7 +147,7 @@ export default function AboutUsPage() {
               {t("banner.subtitle")}<br/>
               {t("banner.subtitleLine2")}
             </p>
-            <button type="button" className="banner-cta bg-white text-gray-900 text-xs font-bold uppercase
+            <button type="button" onClick={() => navigate("/ship-now")} className="banner-cta bg-white text-gray-900 text-xs font-bold uppercase
               tracking-widest px-6 py-2.5 rounded-full border-none cursor-pointer
               hover:bg-blue-50 transition-colors">
               {t("banner.shipNow")}

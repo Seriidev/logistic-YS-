@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuChevronDown, LuSearch } from "react-icons/lu";
 import Footer from "../components/Footer";
@@ -52,6 +53,7 @@ function AccordionItem({ question, answer }) {
 
 export default function OnlineStoresPage() {
   const { t } = useTranslation("onlineStores");
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [country, setCountry] = useState("usa");
   const [category, setCategory] = useState("electronics");
@@ -109,7 +111,7 @@ export default function OnlineStoresPage() {
             {t("banner.subtitle")}<br/>
             {t("banner.subtitleLine2")}
           </p>
-          <button type="button" className="banner-cta bg-white text-gray-900 text-xs font-bold uppercase
+          <button type="button" onClick={() => navigate("/ship-now")} className="banner-cta bg-white text-gray-900 text-xs font-bold uppercase
             tracking-widest px-6 py-2.5 rounded-full border-none cursor-pointer
             hover:bg-blue-50 transition-colors duration-150">
             {t("banner.shipNow")}

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuChevronDown, LuSearch } from "react-icons/lu";
 
@@ -11,6 +12,7 @@ const COUNTRY_KEYS = [
 
 export default function LocHero() {
   const { t } = useTranslation("location");
+  const navigate = useNavigate();
   const [continent, setContinent] = useState("all");
   const [search, setSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -59,6 +61,7 @@ export default function LocHero() {
 
           <button
             type="button"
+            onClick={() => navigate("/ship-now")}
             className="banner-cta w-full sm:w-auto bg-white text-gray-900 text-sm font-bold uppercase tracking-wider px-6 py-2.5 rounded-full border-none cursor-pointer hover:bg-blue-50 transition-colors duration-150 mb-5"
           >
             {t("hero.shipNow")}

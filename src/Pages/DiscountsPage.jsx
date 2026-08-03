@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { LuEye } from "react-icons/lu";
 import Footer from "../components/Footer";
@@ -16,6 +17,7 @@ const DISCOUNT_ITEMS = [
 
 export default function DiscountsPage() {
   const { t } = useTranslation("discounts");
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("discounts");
   const [selectedDiscount, setSelectedDiscount] = useState(null);
 
@@ -117,6 +119,7 @@ export default function DiscountsPage() {
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-4">{t("title")}</h1>
             <button
               type="button"
+              onClick={() => navigate("/ship-now")}
               className="banner-cta bg-white text-gray-900 text-xs font-bold uppercase tracking-widest px-6 py-2.5 rounded-full border-none cursor-pointer hover:bg-blue-50 transition-colors duration-150"
             >
               {t("shipNow")}

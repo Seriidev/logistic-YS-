@@ -41,10 +41,10 @@ export default function CalculatePage() {
 
   const handleCreateParcel = () => {
     if (!isAuthenticated()) {
-      navigate("/signup?redirect=/create-shipment");
+      navigate("/signup?redirect=/ship-now");
       return;
     }
-    navigate("/create-shipment");
+    navigate("/ship-now");
   };
 
   return (

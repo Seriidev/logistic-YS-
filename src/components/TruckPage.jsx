@@ -31,6 +31,8 @@ export default function TrackPage() {
   const [notFound, setNotFound] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [timeline, setTimeline] = useState(null);
+  const [eta, setEta] = useState(null);
 
   const mockResults = useMemo(
     () => ({
@@ -74,14 +76,52 @@ export default function TrackPage() {
     if (!trackingNumber.trim()) return;
     setLoading(true);
     setError(null);
+    setTimeline(null);
+    setEta(null);
     try {
       const apiResult = await api(`/tracking/${trackingNumber.trim()}`);
-      setResult(apiResult.data ?? apiResult);
-      console.log("tracking response:", apiResult.data ?? apiResult);
+      const shipment = apiResult.data ?? apiResult;
+      setResult(shipment);
+      console.log("tracking response:", shipment);
       setNotFound(false);
+
+      const id = shipment?.id;
+      if (id) {
+        try {
+          const timelineRes = await api(`/tracking/${id}/timeline`);
+          console.log("timeline response:", timelineRes);
+          const timelineData = timelineRes?.data ?? timelineRes;
+          const timelineList = Array.isArray(timelineData)
+            ? timelineData
+            : Array.isArray(timelineData?.events)
+              ? timelineData.events
+              : Array.isArray(timelineData?.steps)
+                ? timelineData.steps
+                : Array.isArray(timelineData?.timeline)
+                  ? timelineData.timeline
+                  : Array.isArray(timelineData?.data)
+                    ? timelineData.data
+                    : null;
+          setTimeline(timelineList);
+        } catch (timelineErr) {
+          console.log("timeline error:", timelineErr);
+          setTimeline(null);
+        }
+
+        try {
+          const etaRes = await api(`/tracking/${id}/eta`);
+          console.log("eta response:", etaRes);
+          setEta(etaRes?.data ?? etaRes);
+        } catch (etaErr) {
+          console.log("eta error:", etaErr);
+          setEta(null);
+        }
+      }
     } catch (err) {
       setError("Shipment not found. Please check the tracking number.");
       setResult(null);
+      setTimeline(null);
+      setEta(null);
       setNotFound(true);
     } finally {
       setLoading(false);
@@ -203,32 +243,75 @@ export default function TrackPage() {
               </div>
               <div>
                 <p className="text-xs text-gray-400 mb-1">{t("result.eta")}</p>
-                <p className="text-sm font-semibold text-blue-500">—</p>
+                <p className="text-sm font-semibold text-blue-500">
+                  {(() => {
+                    if (eta == null) return "—";
+                    const raw =
+                      typeof eta === "string" || typeof eta === "number"
+                        ? eta
+                        : eta?.eta ??
+                          eta?.estimatedDelivery ??
+                          eta?.estimatedArrival ??
+                          eta?.estimatedDeliveryAt ??
+                          eta?.date ??
+                          eta?.value ??
+                          null;
+                    if (raw == null || raw === "") return "—";
+                    const asDate = new Date(raw);
+                    if (!Number.isNaN(asDate.getTime()) && String(raw).length > 4) {
+                      return asDate.toLocaleString();
+                    }
+                    return String(raw);
+                  })()}
+                </p>
               </div>
             </div>
 
-            {Array.isArray(result.steps) && result.steps.length > 0 && (
+            {Array.isArray(timeline) && timeline.length > 0 && (
               <div className="tracking-steps">
-                {result.steps.map((step, i) => (
-                  <div key={i} className="flex items-center flex-1 min-w-[5.5rem] sm:min-w-0 shrink-0 sm:shrink">
-                    <div className="flex flex-col items-center flex-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step.done ? "bg-blue-500" : "bg-gray-100"}`}>
-                        {step.done ? (
-                          <LuCheck className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
-                        ) : (
-                          <div className="w-2 h-2 rounded-full bg-gray-300" />
-                        )}
+                {timeline.map((step, i) => {
+                  const done = Boolean(step?.done ?? step?.completed ?? step?.isCompleted ?? step?.isDone);
+                  const label = step?.label || step?.status || step?.event || step?.title || step?.name || "—";
+                  const dateRaw = step?.date || step?.createdAt || step?.timestamp || step?.occurredAt || step?.updatedAt;
+                  const date =
+                    dateRaw == null || dateRaw === ""
+                      ? ""
+                      : (() => {
+                          const d = new Date(dateRaw);
+                          return Number.isNaN(d.getTime()) ? String(dateRaw) : d.toLocaleDateString();
+                        })();
+                  return (
+                    <div key={step?.id || i} className="flex items-center flex-1 min-w-[5.5rem] sm:min-w-0 shrink-0 sm:shrink">
+                      <div className="flex flex-col items-center flex-1">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${done ? "bg-blue-500" : "bg-gray-100"}`}>
+                          {done ? (
+                            <LuCheck className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+                          ) : (
+                            <div className="w-2 h-2 rounded-full bg-gray-300" />
+                          )}
+                        </div>
+                        <p className={`text-xs font-semibold mt-2 text-center ${done ? "text-blue-500" : "text-gray-400"}`}>
+                          {label}
+                        </p>
+                        <p className="text-[10px] text-gray-400 mt-0.5 text-center">{date}</p>
                       </div>
-                      <p className={`text-xs font-semibold mt-2 text-center ${step.done ? "text-blue-500" : "text-gray-400"}`}>
-                        {step.label}
-                      </p>
-                      <p className="text-[10px] text-gray-400 mt-0.5 text-center">{step.date}</p>
+                      {i < timeline.length - 1 && (
+                        <div
+                          className={`h-0.5 flex-1 -mt-8 ${
+                            Boolean(
+                              timeline[i + 1]?.done ??
+                                timeline[i + 1]?.completed ??
+                                timeline[i + 1]?.isCompleted ??
+                                timeline[i + 1]?.isDone,
+                            )
+                              ? "bg-blue-500"
+                              : "bg-gray-200"
+                          }`}
+                        />
+                      )}
                     </div>
-                    {i < result.steps.length - 1 && (
-                      <div className={`h-0.5 flex-1 -mt-8 ${result.steps[i + 1].done ? "bg-blue-500" : "bg-gray-200"}`} />
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

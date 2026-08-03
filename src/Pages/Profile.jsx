@@ -45,6 +45,9 @@ export default function ProfilePage() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [referrals, setReferrals] = useState([]);
+  const [referralCodeInput, setReferralCodeInput] = useState("");
+  const [referralMessage, setReferralMessage] = useState(null);
 
   // Load user data from API
   useEffect(() => {
@@ -60,8 +63,9 @@ export default function ProfilePage() {
       api("/wallet/transactions?limit=3").catch(() => ({ data: [] })),
       api("/shipments/stats").catch((err) => ({ __statsError: err })),
       api("/notifications/unread-count").catch((err) => ({ __notifError: err })),
+      api("/wallet/referrals").catch((err) => ({ __referralsError: err })),
     ])
-      .then(([me, shipmentsData, walletData, txData, statsData, notifCountData]) => {
+      .then(([me, shipmentsData, walletData, txData, statsData, notifCountData, referralsData]) => {
         setUser({
           id: me.data?.id || "",
           firstName: me.data?.firstName || "",
@@ -111,6 +115,20 @@ export default function ProfilePage() {
             ) || 0,
           );
         }
+
+        console.log("referrals response:", referralsData);
+        if (!referralsData?.__referralsError) {
+          const list = Array.isArray(referralsData?.data?.data)
+            ? referralsData.data.data
+            : Array.isArray(referralsData?.data)
+              ? referralsData.data
+              : Array.isArray(referralsData?.referrals)
+                ? referralsData.referrals
+                : Array.isArray(referralsData)
+                  ? referralsData
+                  : [];
+          setReferrals(list);
+        }
       })
       .catch(() => setError("Failed to load profile"))
       .finally(() => {
@@ -155,6 +173,33 @@ export default function ProfilePage() {
       toast.error(err?.message || "Transfer failed");
     } finally {
       setTransferring(false);
+    }
+  };
+
+  const copyToClipboard = async (value) => {
+    try {
+      await navigator.clipboard.writeText(String(value || ""));
+      toast.success("Copied!");
+    } catch (_) {
+      toast.error("Failed to copy");
+    }
+  };
+
+  const applyReferralCode = async () => {
+    const code = referralCodeInput.trim();
+    if (!code) return;
+    setReferralMessage(null);
+    try {
+      const res = await api("/wallet/referral", {
+        method: "POST",
+        body: JSON.stringify({ referralCode: code }),
+      });
+      console.log("apply referral response:", res);
+      setReferralMessage(res?.message || res?.data?.message || "Referral code applied!");
+      setReferralCodeInput("");
+    } catch (err) {
+      console.log("apply referral error:", err);
+      setReferralMessage(err?.message || "Failed to apply referral code");
     }
   };
 
@@ -421,18 +466,81 @@ export default function ProfilePage() {
                     </p>
                     <button
                       type="button"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(String(user?.id || ""));
-                          toast.success("Copied!");
-                        } catch (_) {
-                          toast.error("Failed to copy");
-                        }
-                      }}
+                      onClick={() => copyToClipboard(user?.id)}
                       className="text-sm font-semibold text-white/90 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-white shrink-0"
                     >
                       copy ID
                     </button>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-white/20 flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm text-white/80 font-medium min-w-0 truncate">
+                        Referral code: {wallet?.referralCode || wallet?.referral_code || user?.id}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
+                        }
+                        className="text-sm font-semibold text-white/90 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-white shrink-0"
+                      >
+                        copy
+                      </button>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-semibold text-white/90">
+                        Referred users ({referrals.length})
+                      </p>
+                      {referrals.length > 0 && (
+                        <div className="mt-2 flex flex-col gap-1.5">
+                          {referrals.map((r, i) => {
+                            const name =
+                              r?.name ||
+                              r?.fullName ||
+                              [r?.firstName, r?.lastName].filter(Boolean).join(" ") ||
+                              r?.email ||
+                              r?.user?.email ||
+                              r?.user?.name ||
+                              "User";
+                            const email = r?.email || r?.user?.email || "";
+                            return (
+                              <div
+                                key={r?.id || r?.userId || i}
+                                className="bg-white/10 rounded-xl px-3.5 py-2"
+                              >
+                                <p className="text-sm font-medium text-white truncate">{name}</p>
+                                {email && name !== email ? (
+                                  <p className="text-xs text-white/70 truncate">{email}</p>
+                                ) : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="text"
+                        value={referralCodeInput}
+                        onChange={(e) => setReferralCodeInput(e.target.value)}
+                        placeholder="Enter referral code"
+                        className="flex-1 min-w-0 h-10 px-3 rounded-xl bg-white/15 border border-white/20 outline-none text-sm text-white placeholder:text-white/50 focus:border-white/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyReferralCode}
+                        disabled={!referralCodeInput.trim()}
+                        className="h-10 px-4 rounded-full bg-white text-blue-600 text-sm font-bold border-none cursor-pointer hover:bg-blue-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {referralMessage && (
+                      <p className="text-xs text-white/90 font-medium">{referralMessage}</p>
+                    )}
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center gap-3 mt-6">
