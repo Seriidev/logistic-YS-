@@ -6,6 +6,7 @@ import Footer from "../../components/Footer";
 import PasswordInput from "../../components/PasswordInput";
 import PhoneInputField from "../../components/PhoneInputField";
 import { loginUser, registerUser, loginWithGoogle, requestPasswordReset } from "../../utils/auth";
+import { api } from "../../utils/api";
 import { getPhoneValidationError } from "../../utils/phone";
 import AuthIllustration from "./AuthIllustration";
 
@@ -56,6 +57,11 @@ export default function AuthPage() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotMessage, setForgotMessage] = useState(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [verifyCode, setVerifyCode] = useState("");
+  const [pendingOnboardingToken, setPendingOnboardingToken] = useState(null);
+  const [verifyLoading, setVerifyLoading] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const isLoginFormValid = useMemo(() => {
     if (!isValidEmail(email)) return false;
@@ -78,17 +84,84 @@ export default function AuthPage() {
     navigate(`${base}${query}`, { replace: true });
   };
 
+  const extractOnboardingToken = (res) =>
+    res?.data?.onboardingToken ?? res?.onboardingToken ?? null;
+
+  const resendVerificationCode = async () => {
+    const res = await api("/auth/resend-verification", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+    const token = extractOnboardingToken(res);
+    setPendingOnboardingToken(token);
+    setNeedsVerification(true);
+    return token;
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
       await loginUser(email, password);
+      setNeedsVerification(false);
+      setVerifyCode("");
+      setPendingOnboardingToken(null);
       window.location.href = "/profile";
     } catch (err) {
-      setError(err?.message || "Invalid email or password");
+      const msg = err?.message || "Invalid email or password";
+      if (typeof msg === "string" && msg.toLowerCase().includes("not verified")) {
+        try {
+          await resendVerificationCode();
+          setVerifyCode("");
+          setError(null);
+        } catch (resendErr) {
+          setNeedsVerification(true);
+          setError(resendErr?.message || msg);
+        }
+      } else {
+        setNeedsVerification(false);
+        setError(msg);
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleVerifyEmail = async (e) => {
+    e.preventDefault();
+    if (!verifyCode.trim() || !pendingOnboardingToken) return;
+    setVerifyLoading(true);
+    setError(null);
+    try {
+      await api("/auth/verify-email", {
+        method: "POST",
+        body: JSON.stringify({
+          onboardingToken: pendingOnboardingToken,
+          code: verifyCode.trim(),
+        }),
+      });
+      await loginUser(email, password);
+      setNeedsVerification(false);
+      setVerifyCode("");
+      setPendingOnboardingToken(null);
+      window.location.href = "/profile";
+    } catch (err) {
+      setError(err?.message || "Verification failed");
+    } finally {
+      setVerifyLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError(null);
+    try {
+      await resendVerificationCode();
+    } catch (err) {
+      setError(err?.message || "Failed to resend verification code");
+    } finally {
+      setResendLoading(false);
     }
   };
 
@@ -103,7 +176,10 @@ export default function AuthPage() {
     setLoading(true);
     setError(null);
     try {
-      await registerUser(email, password, phone);
+      const storedReferral = localStorage.getItem("yuusell_referral_code");
+      // TODO: confirm exact field name with backend once Swagger updates
+      await registerUser(email, password, phone, storedReferral || undefined);
+      localStorage.removeItem("yuusell_referral_code");
       window.location.href = "/profile";
     } catch (err2) {
       setError(err2?.message || "Registration failed");
@@ -288,8 +364,59 @@ export default function AuthPage() {
                       </div>
                     )}
 
-                    {error && (
-                      <p className="text-xs text-red-500">{error}</p>
+                    {needsVerification ? (
+                      <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 flex flex-col gap-3">
+                        <p className="text-xs text-gray-600">
+                          Please enter the verification code sent to your email
+                        </p>
+                        <label className="flex flex-col gap-1.5">
+                          <span className="text-xs font-medium text-gray-500">Verification code</span>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            autoComplete="one-time-code"
+                            maxLength={6}
+                            placeholder="000000"
+                            value={verifyCode}
+                            onChange={(e) =>
+                              setVerifyCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                            }
+                            className={inputClass}
+                          />
+                        </label>
+                        {error && (
+                          <p className="text-xs text-red-500">{error}</p>
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleVerifyEmail}
+                          disabled={
+                            verifyLoading ||
+                            verifyCode.trim().length !== 6 ||
+                            !pendingOnboardingToken
+                          }
+                          className={`w-full min-h-[44px] text-white text-sm font-bold uppercase tracking-wider rounded-2xl border-none transition-colors duration-150 font-[inherit]
+                            ${
+                              verifyLoading ||
+                              verifyCode.trim().length !== 6 ||
+                              !pendingOnboardingToken
+                                ? "bg-[#b8c8f8] cursor-not-allowed"
+                                : "bg-[#3b63f1] hover:bg-[#2d52e0] cursor-pointer"
+                            }`}
+                        >
+                          {verifyLoading ? "Verifying..." : "Verify"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleResendVerification}
+                          disabled={resendLoading || loading}
+                          className="text-xs text-blue-500 bg-transparent border-none cursor-pointer hover:underline font-[inherit] p-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {resendLoading ? "Sending..." : "Resend code"}
+                        </button>
+                      </div>
+                    ) : (
+                      error && <p className="text-xs text-red-500">{error}</p>
                     )}
 
                     <div className="relative flex items-center gap-3 my-2">

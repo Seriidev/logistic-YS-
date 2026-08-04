@@ -20,11 +20,14 @@ export async function loginUser(email, password) {
   return user;
 }
 
-export async function registerUser(email, password, phone) {
+export async function registerUser(email, password, phone, referralCode) {
+  const payload = { email, password, phone };
+  // TODO: confirm exact field name with backend once Swagger updates
+  if (referralCode) payload.referralCode = referralCode;
   const res = await fetch(BASE_URL + "/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, phone }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) throw await res.json();
   const json = await res.json();

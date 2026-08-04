@@ -440,15 +440,28 @@ export default function ProfilePage() {
                 <p className="text-sm text-gray-700 font-medium min-w-0 truncate">
                   Referral code: {wallet?.referralCode || wallet?.referral_code || user?.id}
                 </p>
-                <button
-                  type="button"
-                  onClick={() =>
-                    copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
-                  }
-                  className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600 shrink-0"
-                >
-                  copy
-                </button>
+                <div className="flex items-center gap-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
+                    }
+                    className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600"
+                  >
+                    copy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const code = wallet?.referralCode || wallet?.referral_code || user?.id;
+                      if (!code) return;
+                      copyToClipboard(`${window.location.origin}/?referral=${code}`);
+                    }}
+                    className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600"
+                  >
+                    Copy referral link
+                  </button>
+                </div>
               </div>
 
               <div>

@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import BannerCarousel from "./components/Banner";
 import Services from "./components/Services";
@@ -52,9 +53,22 @@ function HomePage() {
   );
 }
 
+/** First-touch attribution: store ?referral= once if not already set. */
+function ReferralCapture() {
+  const location = useLocation();
+  useEffect(() => {
+    const code = new URLSearchParams(location.search).get("referral")?.trim();
+    if (!code) return;
+    if (localStorage.getItem("yuusell_referral_code")) return;
+    localStorage.setItem("yuusell_referral_code", code);
+  }, [location.search]);
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <ReferralCapture />
       <Header />
       <Routes>
         <Route path="/" element={<HomePage />} />
