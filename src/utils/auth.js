@@ -102,3 +102,23 @@ export async function loginWithGoogle(idToken) {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
   return user;
 }
+
+export async function requestPasswordReset(email) {
+  const res = await fetch(BASE_URL + "/auth/forgot-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}
+
+export async function resetPassword(token, newPassword) {
+  const res = await fetch(BASE_URL + "/auth/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
+  });
+  if (!res.ok) throw await res.json();
+  return res.json();
+}

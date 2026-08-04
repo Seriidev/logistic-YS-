@@ -5,7 +5,7 @@ import { FaApple, FaGoogle } from "react-icons/fa";
 import Footer from "../../components/Footer";
 import PasswordInput from "../../components/PasswordInput";
 import PhoneInputField from "../../components/PhoneInputField";
-import { loginUser, registerUser, loginWithGoogle } from "../../utils/auth";
+import { loginUser, registerUser, loginWithGoogle, requestPasswordReset } from "../../utils/auth";
 import { getPhoneValidationError } from "../../utils/phone";
 import AuthIllustration from "./AuthIllustration";
 
@@ -52,6 +52,10 @@ export default function AuthPage() {
   const [phoneError, setPhoneError] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState(null);
 
   const isLoginFormValid = useMemo(() => {
     if (!isValidEmail(email)) return false;
@@ -134,6 +138,35 @@ export default function AuthPage() {
     window.google.accounts.id.prompt();
   };
 
+  const openForgotPassword = () => {
+    setShowForgotPassword(true);
+    setForgotEmail(email);
+    setForgotMessage(null);
+    setError(null);
+  };
+
+  const handleForgotPasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!isValidEmail(forgotEmail)) {
+      setForgotMessage("Please enter a valid email address.");
+      return;
+    }
+    setForgotLoading(true);
+    setForgotMessage(null);
+    try {
+      await requestPasswordReset(forgotEmail.trim());
+      setForgotMessage(
+        "If an account exists for this email, a reset link has been sent",
+      );
+    } catch (_) {
+      setForgotMessage(
+        "If an account exists for this email, a reset link has been sent",
+      );
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   const breadcrumbLabel = mode === "signup" ? t("breadcrumb.signUp") : t("breadcrumb.logIn");
   const illustrationSrc = mode === "signup" ? "/signup.png" : "/login.png";
   const illustrationAlt = mode === "signup" ? t("illustration.signUpAlt") : t("illustration.loginAlt");
@@ -212,6 +245,52 @@ export default function AuthPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                     />
+
+                    <div className="flex justify-end -mt-2">
+                      <button
+                        type="button"
+                        onClick={openForgotPassword}
+                        className="text-xs text-blue-500 bg-transparent border-none cursor-pointer hover:underline font-[inherit] p-0"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+
+                    {showForgotPassword && (
+                      <div className="rounded-xl bg-blue-50 border border-blue-100 p-4 flex flex-col gap-3">
+                        <p className="text-xs text-gray-600">
+                          Enter your email and we&apos;ll send a password reset link.
+                        </p>
+                        <label className="flex flex-col gap-1.5">
+                          <span className="text-xs font-medium text-gray-500">{t("fields.email")}</span>
+                          <input
+                            type="email"
+                            placeholder={t("fields.emailPlaceholder")}
+                            value={forgotEmail}
+                            onChange={(e) => setForgotEmail(e.target.value)}
+                            className={inputClass}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleForgotPasswordSubmit}
+                          disabled={forgotLoading || !forgotEmail.trim()}
+                          className={`w-full min-h-[44px] text-white text-sm font-bold uppercase tracking-wider rounded-2xl border-none transition-colors duration-150 font-[inherit]
+                            ${forgotLoading || !forgotEmail.trim()
+                              ? "bg-[#b8c8f8] cursor-not-allowed"
+                              : "bg-[#3b63f1] hover:bg-[#2d52e0] cursor-pointer"}`}
+                        >
+                          {forgotLoading ? "Sending..." : "Send reset link"}
+                        </button>
+                        {forgotMessage && (
+                          <p className="text-xs text-gray-600 leading-relaxed">{forgotMessage}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {error && (
+                      <p className="text-xs text-red-500">{error}</p>
+                    )}
 
                     <div className="relative flex items-center gap-3 my-2">
                       <div className="flex-1 h-px bg-gray-200" />

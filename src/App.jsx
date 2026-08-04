@@ -28,7 +28,7 @@ import AboutUsPage from "./Pages/AboutUs";
 import ProhibitedItemsPage from "./Pages/Prohibited";
 import { CalculatePage, CreateShipmentPage, ShipmentDetailsPage } from "./Pages/shipment";
 import ProfilePage from "./Pages/Profile";
-import { AuthPage } from "./Pages/auth";
+import { AuthPage, ResetPasswordPage } from "./Pages/auth";
 import { NotFoundPage, ServerErrorPage } from "./Pages/errors";
 import BackToTopButton from "./components/common/BackToTopButton";
 import AirCargoBookingPage from "./air-cargo-booking/page";
@@ -84,6 +84,7 @@ function App() {
         <Route path="/create-shipment" element={<CreateShipmentPage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/shipments/:id" element={<ShipmentDetailsPage />} />
         <Route path="/500" element={<ServerErrorPage />} />
