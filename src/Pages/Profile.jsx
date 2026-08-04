@@ -455,7 +455,7 @@ export default function ProfilePage() {
                     onClick={() => {
                       const code = wallet?.referralCode || wallet?.referral_code || user?.id;
                       if (!code) return;
-                      copyToClipboard(`${window.location.origin}/?referral=${code}`);
+                      copyToClipboard(`${window.location.origin}/signup?referral=${code}`);
                     }}
                     className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600"
                   >
