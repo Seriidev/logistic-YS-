@@ -75,6 +75,7 @@ export default function ProfilePage() {
           country: me.data?.country || me.country || "",
           city: me.data?.city || me.city || "",
           address: me.data?.address || me.address || "",
+          referralCode: me.data?.referralCode || "",
         });
         setShipments(shipmentsData.data?.data || []);
         setTotalShipments(shipmentsData.data?.meta?.total ?? 0);
@@ -438,13 +439,13 @@ export default function ProfilePage() {
             <div className="bg-gray-50 rounded-2xl sm:rounded-3xl p-5 sm:p-6 flex flex-col gap-3">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm text-gray-700 font-medium min-w-0 truncate">
-                  Referral code: {wallet?.referralCode || wallet?.referral_code || user?.id}
+                  Referral code: {user?.referralCode || wallet?.referralCode || user?.id}
                 </p>
                 <div className="flex items-center gap-3 shrink-0">
                   <button
                     type="button"
                     onClick={() =>
-                      copyToClipboard(wallet?.referralCode || wallet?.referral_code || user?.id)
+                      copyToClipboard(user?.referralCode || wallet?.referralCode || user?.id)
                     }
                     className="text-sm font-semibold text-blue-500 underline underline-offset-2 bg-transparent border-none cursor-pointer hover:text-blue-600"
                   >
@@ -453,7 +454,7 @@ export default function ProfilePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      const code = wallet?.referralCode || wallet?.referral_code || user?.id;
+                      const code = user?.referralCode || wallet?.referralCode || user?.id;
                       if (!code) return;
                       copyToClipboard(`${window.location.origin}/signup?referral=${code}`);
                     }}
