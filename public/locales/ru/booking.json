@@ -12,6 +12,7 @@
   },
   "steps": {
     "shipmentDetails": "Детали отправления",
+    "priceConfirmation": "Подтверждение цены",
     "paymentMethod": "Способ оплаты",
     "paymentDetails": "Платёжные данные",
     "cardPayment": "Оплата картой",

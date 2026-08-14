@@ -12,6 +12,7 @@
   },
   "steps": {
     "shipmentDetails": "Shipment Details",
+    "priceConfirmation": "Price Confirmation",
     "paymentMethod": "Payment Method",
     "paymentDetails": "Payment Details",
     "cardPayment": "Card Payment",

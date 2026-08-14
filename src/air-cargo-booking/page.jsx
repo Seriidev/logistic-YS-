@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ProgressIndicator from "./components/ProgressIndicator";
 import ServiceSelector from "./components/ServiceSelector";
 import EconomyForm from "./components/EconomyForm";
 import ExpressForm from "./components/ExpressForm";
+import PriceConfirmation from "./components/PriceConfirmation";
 import PaymentMethod from "./components/PaymentMethod";
 import PaymentDetails from "./components/PaymentDetails";
 import ShipmentSuccess from "./components/ShipmentSuccess";
@@ -16,6 +17,7 @@ import { api } from "../utils/api";
 
 export default function AirCargoBookingPage() {
   const { t } = useTranslation(["airCargoBooking", "booking"]);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialService = searchParams.get("service") === "express" ? "express" : "economy";
 
@@ -26,6 +28,7 @@ export default function AirCargoBookingPage() {
   const [paymentDetails, setPaymentDetails] = useState({});
   const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -110,7 +113,7 @@ export default function AirCargoBookingPage() {
         console.error("Failed to create economy shipment:", err);
       }
     }
-    goToStep(4);
+    goToStep(5);
   };
 
   const handleExpressPay = async () => {
@@ -155,7 +158,7 @@ export default function AirCargoBookingPage() {
         console.error("Failed to create express shipment:", err);
       }
     }
-    goToStep(4);
+    goToStep(5);
   };
 
   return (
@@ -221,25 +224,39 @@ export default function AirCargoBookingPage() {
           )}
 
           {step === 2 && (
-            <PaymentMethod
-              selected={paymentMethodId}
-              onSelect={setPaymentMethodId}
+            <PriceConfirmation
+              formData={formData}
+              service={service}
+              breakdown={breakdown}
+              onSelectService={handleServiceChange}
+              termsAccepted={termsAccepted}
+              onTermsChange={setTermsAccepted}
               onBack={() => goToStep(1)}
+              onCancel={() => navigate("/")}
               onContinue={() => goToStep(3)}
             />
           )}
 
           {step === 3 && (
+            <PaymentMethod
+              selected={paymentMethodId}
+              onSelect={setPaymentMethodId}
+              onBack={() => goToStep(2)}
+              onContinue={() => goToStep(4)}
+            />
+          )}
+
+          {step === 4 && (
             <PaymentDetails
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
-              onBack={() => goToStep(2)}
+              onBack={() => goToStep(3)}
               onPay={service === "economy" ? handleEconomyPay : handleExpressPay}
               amount={breakdown.total}
             />
           )}
 
-          {step === 4 && <ShipmentSuccess booking={booking} />}
+          {step === 5 && <ShipmentSuccess booking={booking} />}
         </section>
       </main>
       <Footer />
