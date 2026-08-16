@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import StepIndicator from "./components/StepIndicator";
 import ServiceTabs from "./components/ServiceTabs";
 import LTLForm from "./components/LTLForm";
 import FTLForm from "./components/FTLForm";
+import PriceConfirmation from "./components/PriceConfirmation";
 import PaymentMethodStep from "./components/PaymentMethodStep";
 import CardPaymentStep from "./components/CardPaymentStep";
 import SuccessStep from "./components/SuccessStep";
@@ -22,6 +23,7 @@ function defaultsFor(service) {
 
 export default function TruckCargoBookingPage() {
   const { t } = useTranslation(["truckCargoBooking", "booking"]);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialService = searchParams.get("service") === "ftl" ? "ftl" : "ltl";
 
@@ -32,6 +34,7 @@ export default function TruckCargoBookingPage() {
   const [paymentDetails, setPaymentDetails] = useState({});
   const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -127,7 +130,7 @@ export default function TruckCargoBookingPage() {
     } catch (err) {
       console.error("Failed to create truck shipment:", err);
     }
-    goToStep(4);
+    goToStep(5);
   };
 
   return (
@@ -188,27 +191,41 @@ export default function TruckCargoBookingPage() {
           )}
 
           {step === 2 && (
-            <PaymentMethodStep
+            <PriceConfirmation
+              formData={formData}
               service={service}
               breakdown={breakdown}
-              selected={paymentMethodId}
-              onSelect={setPaymentMethodId}
+              onSelectService={handleServiceChange}
+              termsAccepted={termsAccepted}
+              onTermsChange={setTermsAccepted}
               onBack={() => goToStep(1)}
+              onCancel={() => navigate("/")}
               onContinue={() => goToStep(3)}
             />
           )}
 
           {step === 3 && (
+            <PaymentMethodStep
+              service={service}
+              breakdown={breakdown}
+              selected={paymentMethodId}
+              onSelect={setPaymentMethodId}
+              onBack={() => goToStep(2)}
+              onContinue={() => goToStep(4)}
+            />
+          )}
+
+          {step === 4 && (
             <CardPaymentStep
               details={paymentDetails}
               onChange={handlePaymentDetailChange}
-              onBack={() => goToStep(2)}
+              onBack={() => goToStep(3)}
               onPay={handleTruckPay}
               amount={breakdown.total}
             />
           )}
 
-          {step === 4 && <SuccessStep booking={booking} />}
+          {step === 5 && <SuccessStep booking={booking} />}
         </section>
       </main>
       <Footer />

@@ -3,9 +3,10 @@ import { LuCheck } from "react-icons/lu";
 
 const STEPS = [
   { id: 1, key: "shipmentDetails" },
-  { id: 2, key: "paymentMethod" },
-  { id: 3, key: "cardPayment" },
-  { id: 4, key: "shipmentCreated" },
+  { id: 2, key: "priceConfirmation" },
+  { id: 3, key: "paymentMethod" },
+  { id: 4, key: "cardPayment" },
+  { id: 5, key: "shipmentCreated" },
 ];
 
 export default function StepIndicator({ currentStep }) {
