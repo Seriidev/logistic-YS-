@@ -4,6 +4,7 @@ import { LuCheck } from "react-icons/lu";
 
 const STEP_KEYS = [
   "steps.shipmentDetails",
+  "steps.priceConfirmation",
   "steps.paymentMethod",
   "steps.cardPayment",
   "steps.declarationCreated",
