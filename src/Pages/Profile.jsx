@@ -60,7 +60,7 @@ export default function ProfilePage() {
       api("/auth/me"),
       api("/shipments?limit=3&page=1"),
       api("/wallet/me").catch((err) => ({ __walletError: err })),
-      api("/wallet/transactions?limit=3").catch(() => ({ data: [] })),
+      api("/wallet/transactions?limit=5").catch(() => ({ data: [] })),
       api("/shipments/stats").catch((err) => ({ __statsError: err })),
       api("/notifications/unread-count").catch((err) => ({ __notifError: err })),
       api("/wallet/referrals").catch((err) => ({ __referralsError: err })),
@@ -97,7 +97,7 @@ export default function ProfilePage() {
           : Array.isArray(txData?.data)
             ? txData.data
             : [];
-        setTransactions(txList.slice(0, 3));
+        setTransactions(txList.slice(0, 5));
 
         console.log("shipments/stats response:", statsData);
         if (!statsData?.__statsError) {
@@ -143,13 +143,13 @@ export default function ProfilePage() {
       const walletData = await api("/wallet/me");
       setWalletUnavailable(false);
       setWallet(walletData?.data || null);
-      const txData = await api("/wallet/transactions?limit=3");
+      const txData = await api("/wallet/transactions?limit=5");
       const txList = Array.isArray(txData?.data?.data)
         ? txData.data.data
         : Array.isArray(txData?.data)
           ? txData.data
           : [];
-      setTransactions(txList.slice(0, 3));
+      setTransactions(txList.slice(0, 5));
     } catch (_) {
       /* keep current wallet state */
     }
@@ -575,30 +575,58 @@ export default function ProfilePage() {
                   </div>
 
                   {showTxHistory && (
-                    <div className="mt-5 pt-4 border-t border-white/20 flex flex-col gap-2">
+                    <div className="mt-5 pt-4 border-t border-white/20">
                       {transactions.length === 0 ? (
                         <p className="text-sm text-white/70">No recent transactions</p>
                       ) : (
-                        transactions.map((tx, i) => (
-                          <div
-                            key={tx.id || i}
-                            className="flex items-center justify-between gap-3 bg-white/10 rounded-xl px-3.5 py-2.5"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-sm font-semibold truncate">
-                                {tx.type || tx.description || "Transaction"}
-                              </p>
-                              {(tx.createdAt || tx.date) && (
-                                <p className="text-xs text-white/70 mt-0.5">
-                                  {new Date(tx.createdAt || tx.date).toLocaleDateString()}
-                                </p>
-                              )}
-                            </div>
-                            <p className="text-sm font-bold shrink-0">
-                              ${Number(tx.amount ?? 0).toFixed(2)}
-                            </p>
-                          </div>
-                        ))
+                        <div className="overflow-x-auto">
+                          <table className="w-full min-w-[280px] text-left border-separate border-spacing-y-2">
+                            <thead>
+                              <tr className="text-xs text-white/70">
+                                <th className="font-semibold pb-2 pr-3">Date</th>
+                                <th className="font-semibold pb-2 pr-3">Type</th>
+                                <th className="font-semibold pb-2 text-right">Amount</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {transactions.map((tx, i) => {
+                                const rawType = String(tx.type || "").toUpperCase();
+                                const isCredit = ["TRANSFER_IN", "BONUS", "REFERRAL"].includes(rawType);
+                                const isDebit = ["TRANSFER_OUT", "FEE", "COMMISSION"].includes(rawType);
+                                const amountNum = Number(tx.amount ?? 0);
+                                const amountAbs = Math.abs(amountNum).toFixed(2);
+                                let amountDisplay = `$${amountAbs}`;
+                                let amountClass = "text-sm font-bold text-white";
+                                if (isCredit) {
+                                  amountDisplay = `+$${amountAbs}`;
+                                  amountClass = "text-sm font-bold text-emerald-300";
+                                } else if (isDebit) {
+                                  amountDisplay = `-$${amountAbs}`;
+                                  amountClass = "text-sm font-bold text-white/90";
+                                }
+                                const dateValue = tx.createdAt || tx.date;
+                                return (
+                                  <tr
+                                    key={tx.id || i}
+                                    className="bg-white/10"
+                                  >
+                                    <td className="text-xs text-white/70 rounded-l-xl px-3.5 py-2.5 whitespace-nowrap">
+                                      {dateValue
+                                        ? new Date(dateValue).toLocaleDateString()
+                                        : "—"}
+                                    </td>
+                                    <td className="text-sm font-semibold px-3.5 py-2.5 truncate max-w-[140px]">
+                                      {tx.type || tx.description || "Transaction"}
+                                    </td>
+                                    <td className={`rounded-r-xl px-3.5 py-2.5 text-right whitespace-nowrap ${amountClass}`}>
+                                      {amountDisplay}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       )}
                     </div>
                   )}
