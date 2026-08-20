@@ -29,6 +29,9 @@ export default function AirCargoBookingPage() {
   const [apiTrackingNumber, setApiTrackingNumber] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [createdShipmentId, setCreatedShipmentId] = useState(null);
+  const [shipmentCreating, setShipmentCreating] = useState(false);
+  const [shipmentCreateError, setShipmentCreateError] = useState(null);
 
   const selectedMethod = getPaymentMethod(paymentMethodId);
   const paymentFee = selectedMethod ? selectedMethod.fee : 0;
@@ -71,93 +74,73 @@ export default function AirCargoBookingPage() {
     ...(apiTrackingNumber ? { trackingNumber: apiTrackingNumber } : {}),
   };
 
-  const handleEconomyPay = async () => {
-    if (service === "economy") {
+  const createDraftShipment = async () => {
+    setShipmentCreateError(null);
+    const res = await api("/shipments", {
+      method: "POST",
+      body: JSON.stringify({
+        recipientName: formData.recipientName,
+        recipientEmail: formData.recipientEmail,
+        description: formData.specialInstructions || "",
+        weight: Number(formData.weight) || 0,
+        dimensions: [formData.length, formData.width, formData.height].filter(Boolean).join("x"),
+        quantity: 1,
+        originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
+        destinationAddress: formData.destinationCountry,
+        declaredValue: Number(formData.declaredValue) || 0,
+        shippingCost: breakdown.total,
+        currency: "USD",
+        notes: formData.specialInstructions || "",
+        type: "AIR",
+      }),
+    });
+    const tracking =
+      res?.data?.trackingNumber || res?.trackingNumber || null;
+    if (tracking) setApiTrackingNumber(tracking);
+    const shipmentId = res?.data?.id || res?.id || null;
+    if (!shipmentId) {
+      throw new Error("Shipment created but no id returned");
+    }
+    setCreatedShipmentId(shipmentId);
+    console.log("createdShipmentId:", shipmentId);
+    if (shipmentId && attachedFile) {
       try {
-        const res = await api("/shipments", {
+        const uploadBody = new FormData();
+        uploadBody.append("file", attachedFile);
+        uploadBody.append("type", "OTHER");
+        await api(`/shipments/${shipmentId}/documents`, {
           method: "POST",
-          body: JSON.stringify({
-            recipientName: formData.recipientName,
-            recipientEmail: formData.recipientEmail,
-            description: formData.specialInstructions || "",
-            weight: Number(formData.weight) || 0,
-            dimensions: [formData.length, formData.width, formData.height].filter(Boolean).join("x"),
-            quantity: 1,
-            originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
-            destinationAddress: formData.destinationCountry,
-            declaredValue: Number(formData.declaredValue) || 0,
-            shippingCost: breakdown.total,
-            currency: "USD",
-            notes: formData.specialInstructions || "",
-            type: "AIR",
-          }),
+          body: uploadBody,
         });
-        const tracking =
-          res?.data?.trackingNumber || res?.trackingNumber || null;
-        if (tracking) setApiTrackingNumber(tracking);
-        const shipmentId = res?.data?.id || res?.id || null;
-        if (shipmentId && attachedFile) {
-          try {
-            const formData = new FormData();
-            formData.append("file", attachedFile);
-            formData.append("type", "OTHER");
-            await api(`/shipments/${shipmentId}/documents`, {
-              method: "POST",
-              body: formData,
-            });
-          } catch (uploadErr) {
-            console.error("Document upload failed (shipment was still created successfully):", uploadErr);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to create economy shipment:", err);
+      } catch (uploadErr) {
+        console.error("Document upload failed (shipment was still created successfully):", uploadErr);
       }
     }
+    return res;
+  };
+
+  const handlePaymentMethodContinue = async () => {
+    if (shipmentCreating) return;
+    setShipmentCreating(true);
+    setShipmentCreateError(null);
+    try {
+      await createDraftShipment();
+      goToStep(4);
+    } catch (err) {
+      console.error("Failed to create draft shipment:", err);
+      setShipmentCreateError(
+        err?.message || "Failed to create shipment. Please try again.",
+      );
+    } finally {
+      setShipmentCreating(false);
+    }
+  };
+
+  const handleEconomyPay = async () => {
     goToStep(5);
   };
 
   const handleExpressPay = async () => {
-    if (service === "express") {
-      try {
-        const res = await api("/shipments", {
-          method: "POST",
-          body: JSON.stringify({
-            recipientName: formData.recipientName,
-            recipientEmail: formData.recipientEmail,
-            description: formData.specialInstructions || "",
-            weight: Number(formData.weight) || 0,
-            dimensions: [formData.length, formData.width, formData.height].filter(Boolean).join("x"),
-            quantity: 1,
-            originAddress: `${formData.fromCountry}, ${formData.zipCode}`,
-            destinationAddress: formData.destinationCountry,
-            declaredValue: Number(formData.declaredValue) || 0,
-            shippingCost: breakdown.total,
-            currency: "USD",
-            notes: formData.specialInstructions || "",
-            type: "AIR",
-          }),
-        });
-        const tracking =
-          res?.data?.trackingNumber || res?.trackingNumber || null;
-        if (tracking) setApiTrackingNumber(tracking);
-        const shipmentId = res?.data?.id || res?.id || null;
-        if (shipmentId && attachedFile) {
-          try {
-            const formData = new FormData();
-            formData.append("file", attachedFile);
-            formData.append("type", "OTHER");
-            await api(`/shipments/${shipmentId}/documents`, {
-              method: "POST",
-              body: formData,
-            });
-          } catch (uploadErr) {
-            console.error("Document upload failed (shipment was still created successfully):", uploadErr);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to create express shipment:", err);
-      }
-    }
     goToStep(5);
   };
 
@@ -238,12 +221,24 @@ export default function AirCargoBookingPage() {
           )}
 
           {step === 3 && (
-            <PaymentMethod
-              selected={paymentMethodId}
-              onSelect={setPaymentMethodId}
-              onBack={() => goToStep(2)}
-              onContinue={() => goToStep(4)}
-            />
+            <>
+              <PaymentMethod
+                selected={paymentMethodId}
+                onSelect={setPaymentMethodId}
+                onBack={() => goToStep(2)}
+                onContinue={handlePaymentMethodContinue}
+              />
+              {shipmentCreating && (
+                <p className="max-w-2xl mx-auto mt-3 text-sm text-gray-500 text-center">
+                  Creating shipment…
+                </p>
+              )}
+              {shipmentCreateError && (
+                <p className="max-w-2xl mx-auto mt-3 text-sm text-red-500 text-center">
+                  {shipmentCreateError}
+                </p>
+              )}
+            </>
           )}
 
           {step === 4 && (
